@@ -4,4 +4,6 @@ function userUpdateChat(input) {
     newInput.appendChild(document.createTextNode('You: ' + input.value));
     chatDiv.appendChild(newInput);
     document.getElementById("inputBox").value = "";
+    var element = document.getElementById("chatHistory");
+    element.scrollTop = element.scrollHeight;
 }
