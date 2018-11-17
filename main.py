@@ -1,13 +1,14 @@
-from flask import Flask, g, render_template
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
 
     return render_template('index.html')
+
 
 
 
