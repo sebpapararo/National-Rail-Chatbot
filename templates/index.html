@@ -5,8 +5,9 @@
     <title>Group 17 Chatbot</title>
     <script type="text/javascript" src="static/main.js"></script>
     <link rel="stylesheet" type="text/css" href="static/main.css">
+
 </head>
-<body>
+<body onload="displayChatHistory()">
 
     <h1>Group 17 - Train Booking Chatbot</h1>
 
@@ -19,7 +20,7 @@
 
         <br>
         <input name="inputBox" id="inputBox" placeholder="say to the bot... ">
-        <input type="button" value="Say it" onclick="userUpdateChat(inputBox)">
+        <input type="button" value="Say it" onclick="updateChatHistory()">
 
     </div>
 
