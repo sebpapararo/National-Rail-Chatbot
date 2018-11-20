@@ -23,7 +23,8 @@ if __name__ == '__main__':
     x = MyClass("I would like to book a train please")
     x.getVerbs()
 
-    x.query()
+    #x.query()
+    #x.containsBRH()
 
 
 #https://www.nltk.org/book/ch05.html
@@ -31,3 +32,5 @@ if __name__ == '__main__':
 #https://www.nltk.org/book/ch07.html
 
 #https://stackoverflow.com/questions/33318975/how-to-get-common-tag-pattern-for-sentences-list-in-python-with-nltk
+
+#https://towardsdatascience.com/a-practitioners-guide-to-natural-language-processing-part-i-processing-understanding-text-9f4abfd13e72

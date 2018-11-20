@@ -145,40 +145,61 @@ class MyClass:
     def getVerbs(self):
         global userInput
         test = userInput
-        print(nltk.pos_tag(['He'] + test))
+        #print(nltk.pos_tag(['He'] + test))
 
-        verbs = {}
+        taggedWords = nltk.pos_tag(userInput)
+        print(taggedWords)
 
-        verbs['book'] = 'V'
+        if(self.containsBRH() == True):
+            print("Hello World!")
+            taggedWordsTrue = nltk.pos_tag(userInput)
+            print(taggedWordsTrue)
 
-        print(verbs)
 
-        for w in test:
-            print(w)
-            print(wordnet.synsets(w))
 
         # for w in test:
-        #     tmp = wordnet.synsets(w)[0].pos()
-        #     print (w, ":", tmp)
-
-        test2 = nltk.pos_tag(test)
-        grammar = "NP: {<DT>?<JJ>*<NN>}"
-        cp = nltk.RegexpParser(grammar)
-        result = cp.parse(test2)
-        print(result)
-        result.draw()
+        #     print(w)
+        #     print(wordnet.synsets(w))
+        #
+        # # for w in test:
+        # #     tmp = wordnet.synsets(w)[0].pos()
+        # #     print (w, ":", tmp)
+        #
+        # test2 = nltk.pos_tag(test)
+        # grammar = "NP: {<DT>?<JJ>*<NN>}"
+        # cp = nltk.RegexpParser(grammar)
+        # result = cp.parse(test2)
+        # print("Result: ", result)
+        # result.draw()
 
         #print(nltk.pos_tag(test))
 
         #https://www.nltk.org/book/ch05.html
 
+    def containsBRH(self):
+        global userInput
+
+        bookingSynonyms = []
+        for s in wordnet.synsets('reserve'):
+            bookingSynonyms = s.lemma_names()
+            #print(s.name(), s.lemma_names())
+
+        #print(bookingSynonyms)
+
+        for w in userInput:
+            for b in bookingSynonyms:
+                if(w == b):
+                    print("True")
+                    return True
+        print("False")
+        return False
 
 
-    def query(self):
-        locs = [('Omnicom', 'IN', 'New York'),
-                ('DDB Needham', 'IN', 'New York'),
-                ('Kaplan Thaler Group', 'IN', 'New York'),
-                ('BBDO South', 'IN', 'Atlanta'),
-                ('Georgia-Pacific', 'IN', 'Atlanta')]
-        query = [e1 for (e1, rel, e2) in locs if e2 == 'Atlanta']
-        print(query)
+    # def query(self):
+    #     locs = [('Omnicom', 'IN', 'New York'),
+    #             ('DDB Needham', 'IN', 'New York'),
+    #             ('Kaplan Thaler Group', 'IN', 'New York'),
+    #             ('BBDO South', 'IN', 'Atlanta'),
+    #             ('Georgia-Pacific', 'IN', 'Atlanta')]
+    #     query = [e1 for (e1, rel, e2) in locs if e2 == 'Atlanta']
+    #     print(query)
