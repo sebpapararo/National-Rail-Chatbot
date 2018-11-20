@@ -20,9 +20,14 @@ if __name__ == '__main__':
     y = testingGround()
     #y.testing()
 
-    x = MyClass("Book a train please")
+    x = MyClass("I would like to book a train please")
     x.getVerbs()
+
+    x.query()
 
 
 #https://www.nltk.org/book/ch05.html
 
+#https://www.nltk.org/book/ch07.html
+
+#https://stackoverflow.com/questions/33318975/how-to-get-common-tag-pattern-for-sentences-list-in-python-with-nltk
