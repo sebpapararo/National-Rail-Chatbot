@@ -1,4 +1,3 @@
-from nlpu import *
 from flask import Flask, render_template
 
 app = Flask(__name__)
@@ -15,13 +14,13 @@ def index():
 
 
 if __name__ == '__main__':
-    #app.run(host='127.0.0.1', debug=True)
+    app.run(host='127.0.0.1', debug=True)
 
-    y = testingGround()
+    # y = testingGround()
     #y.testing()
 
-    x = MyClass("Book a train please")
-    x.getVerbs()
+    # x = MyClass("Book a train please")
+    # x.getVerbs()
 
 
 #https://www.nltk.org/book/ch05.html
