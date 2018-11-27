@@ -1,14 +1,14 @@
 from nlpu import *
-from flask import Flask, render_template
+#from flask import Flask, render_template
 
-app = Flask(__name__)
+#app = Flask(__name__)
 
 
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
+#@app.route('/', methods=['GET', 'POST'])
+#def index():
 
-    return render_template('index.html')
+   #return render_template('index.html')
 
 
 
@@ -20,8 +20,8 @@ if __name__ == '__main__':
     y = testingGround()
     #y.testing()
 
-    x = MyClass("I would like to book a train please")
-    x.getVerbs()
+    x = MyClass("I would like to book a train please at 13:00")
+    #x.getVerbs()
 
     #x.query()
     #x.containsBRH()

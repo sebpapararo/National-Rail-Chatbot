@@ -1,10 +1,12 @@
 import nltk
 import nltk, re, pprint
+import time, datetime
 from nltk import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import wordnet
+
 ##############Book examle and practice#############
 #nltk.download()
 # from nltk.book import *
@@ -128,19 +130,32 @@ class MyClass:
         token = RegexpTokenizer(r'\w+')
         words = token.tokenize(sent)
         stop_words = set(stopwords.words("english"))
-
-        filtered_sent = []  #############Removes 'a' 'to'  'in' etc...
+        #-----------------Removes 'a' 'to'  'in' etc...
+        filtered_sent = []
         for w in words:
             if w not in stop_words:
                 filtered_sent.append(w)
-
-        lem = WordNetLemmatizer()  ########Removes -ing -ed -s
+        #-----------------Removes -ing -ed -s
+        lem = WordNetLemmatizer()
         lemmated = []
         for q in filtered_sent:
             lemmated.append(lem.lemmatize(q, "v"))
 
         userInput = lemmated
         print("Individual Words:", userInput)
+
+        if (self.containsBRH() == True):
+            print("The User wants to reserve a ticket.")
+
+
+        if (self.containsTime()[0] == True):
+            print("The time given is: ", self.containsTime()[1])
+        else:
+            print("No time given")
+
+
+
+
 
     def getVerbs(self):
         global userInput
@@ -189,12 +204,39 @@ class MyClass:
         for w in userInput:
             for b in bookingSynonyms:
                 if(w == b):
-                    print("True")
+                    #print("True")
                     return True
-        print("False")
+        #print("False")
+        return False
+
+    def containsTime(self):
+        global userInput
+        time = ""
+        for w in userInput:
+            if(w.isdigit()):
+                time+=w
+
+        if(time != ""):
+            return True, time
         return False
 
 
+        # for w in rawWords:
+        #     if(time.strptime(w, '%H:%M')):
+        #         return True, w
+        # return False
+
+            # try:
+            #     time.strptime(w, '%H:%M')
+            #     return True, w
+            # except ValueError:
+            #     return False
+
+
+    def containsLoc(self):
+
+
+        return True
     # def query(self):
     #     locs = [('Omnicom', 'IN', 'New York'),
     #             ('DDB Needham', 'IN', 'New York'),
