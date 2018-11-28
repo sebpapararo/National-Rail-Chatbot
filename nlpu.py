@@ -6,7 +6,6 @@ from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import wordnet
-
 ##############Book examle and practice#############
 #nltk.download()
 # from nltk.book import *
@@ -144,14 +143,15 @@ class MyClass:
         userInput = lemmated
         print("Individual Words:", userInput)
 
-        if (self.containsBRH() == True):
-            print("The User wants to reserve a ticket.")
+        # if (self.containsBRH() == True):
+        #     print("The User wants to reserve a ticket.")
 
 
-        if (self.containsTime()[0] == True):
-            print("The time given is: ", self.containsTime()[1])
-        else:
-            print("No time given")
+
+        # if (self.containsTime()[0] == True):
+        #     print("The time given is: ", self.containsTime()[1])
+        # else:
+        #     print("No time given")
 
 
 
@@ -237,6 +237,8 @@ class MyClass:
 
 
         return True
+
+
     # def query(self):
     #     locs = [('Omnicom', 'IN', 'New York'),
     #             ('DDB Needham', 'IN', 'New York'),
