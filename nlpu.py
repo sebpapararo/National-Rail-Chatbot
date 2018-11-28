@@ -1,5 +1,6 @@
 import nltk
 import nltk, re, pprint
+import time, datetime
 from nltk import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
@@ -128,13 +129,13 @@ class MyClass:
         token = RegexpTokenizer(r'\w+')
         words = token.tokenize(sent)
         stop_words = set(stopwords.words("english"))
-
-        filtered_sent = []  #############Removes 'a' 'to'  'in' etc...
+        #-----------------Removes 'a' 'to'  'in' etc...
+        filtered_sent = []
         for w in words:
             if w not in stop_words:
                 filtered_sent.append(w)
-
-        lem = WordNetLemmatizer()  ########Removes -ing -ed -s
+        #-----------------Removes -ing -ed -s
+        lem = WordNetLemmatizer()
         lemmated = []
         for q in filtered_sent:
             lemmated.append(lem.lemmatize(q, "v"))
@@ -142,68 +143,107 @@ class MyClass:
         userInput = lemmated
         print("Individual Words:", userInput)
 
+        # if (self.containsBRH() == True):
+        #     print("The User wants to reserve a ticket.")
+
+
+
+        # if (self.containsTime()[0] == True):
+        #     print("The time given is: ", self.containsTime()[1])
+        # else:
+        #     print("No time given")
+
+
+
+
+
     def getVerbs(self):
         global userInput
         test = userInput
-        print(nltk.pos_tag(['He'] + test))
+        #print(nltk.pos_tag(['He'] + test))
 
-        verbs = {}
+        taggedWords = nltk.pos_tag(userInput)
+        print(taggedWords)
 
-        verbs['book'] = 'V'
+        if(self.containsBRH() == True):
+            print("Hello World!")
+            taggedWordsTrue = nltk.pos_tag(userInput)
+            print(taggedWordsTrue)
 
-        print(verbs)
 
-        for w in test:
-            print(w)
-            print(wordnet.synsets(w))
 
-        for w in test:
-            tmp = wordnet.synsets(w)[0].pos()
-            print (w, ":", tmp)
+        # for w in test:
+        #     print(w)
+        #     print(wordnet.synsets(w))
+        #
+        # # for w in test:
+        # #     tmp = wordnet.synsets(w)[0].pos()
+        # #     print (w, ":", tmp)
+        #
+        # test2 = nltk.pos_tag(test)
+        # grammar = "NP: {<DT>?<JJ>*<NN>}"
+        # cp = nltk.RegexpParser(grammar)
+        # result = cp.parse(test2)
+        # print("Result: ", result)
+        # result.draw()
 
         #print(nltk.pos_tag(test))
 
         #https://www.nltk.org/book/ch05.html
-            # Just to make it a bit more readable
-            WN_NOUN = 'n'
-            WN_VERB = 'v'
-            WN_ADJECTIVE = 'a'
-            WN_ADJECTIVE_SATELLITE = 's'
-            WN_ADVERB = 'r'
 
-        def convert(word, from_pos, to_pos):
-            """ Transform words given from/to POS tags """
+    def containsBRH(self):
+        global userInput
 
-            synsets = wordnet.synsets(word, pos=from_pos)
+        bookingSynonyms = []
+        for s in wordnet.synsets('reserve'):
+            bookingSynonyms = s.lemma_names()
+            #print(s.name(), s.lemma_names())
 
-            # Word not found
-            if not synsets:
-                return []
+        #print(bookingSynonyms)
 
-            # Get all lemmas of the word (consider 'a'and 's' equivalent)
-            lemmas = [l for s in synsets
-                      for l in s.lemmas
-                      if s.name.split('.')[1] == from_pos
-                            or from_pos in (WN_ADJECTIVE, WN_ADJECTIVE_SATELLITE)
-                                and s.name.split('.')[1] in (WN_ADJECTIVE, WN_ADJECTIVE_SATELLITE)]
-            # Get related forms
-            derivationally_related_forms = [(l, l.derivationally_related_forms()) for l in lemmas]
+        for w in userInput:
+            for b in bookingSynonyms:
+                if(w == b):
+                    #print("True")
+                    return True
+        #print("False")
+        return False
 
-            # filter only the desired pos (consider 'a' and 's' equivalent)
-            related_noun_lemmas = [l for drf in derivationally_related_forms
-                                        for l in drf[1]
-                                        if l.synset.name.split('.')[1] == to_pos
-                                            or to_pos in (WN_ADJECTIVE, WN_ADJECTIVE_SATELLITE)
-                                                and l.synset.name.split('.')[1] in (WN_ADJECTIVE, WN_ADJECTIVE_SATELLITE)]
+    def containsTime(self):
+        global userInput
+        time = ""
+        for w in userInput:
+            if(w.isdigit()):
+                time+=w
+
+        if(time != ""):
+            return True, time
+        return False
 
 
-            # Extract the words from the lemmas
-            words = [l.name for l in related_noun_lemmas]
-            len_words = len(words)
+        # for w in rawWords:
+        #     if(time.strptime(w, '%H:%M')):
+        #         return True, w
+        # return False
 
-            # Build the result in the form of a list containing tuples (word, probability)
-            result = [(w, float(words.count(w)) / len_words) for w in set(words)]
-            result.sort(key=lambda w: -w[1])
+            # try:
+            #     time.strptime(w, '%H:%M')
+            #     return True, w
+            # except ValueError:
+            #     return False
 
-            # return all the possibilities sorted by probability
-            return result
+
+    def containsLoc(self):
+
+
+        return True
+
+
+    # def query(self):
+    #     locs = [('Omnicom', 'IN', 'New York'),
+    #             ('DDB Needham', 'IN', 'New York'),
+    #             ('Kaplan Thaler Group', 'IN', 'New York'),
+    #             ('BBDO South', 'IN', 'Atlanta'),
+    #             ('Georgia-Pacific', 'IN', 'Atlanta')]
+    #     query = [e1 for (e1, rel, e2) in locs if e2 == 'Atlanta']
+    #     print(query)
