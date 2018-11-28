@@ -1,11 +1,10 @@
 import nltk
-import nltk, re, pprint
-import time, datetime
-from nltk import word_tokenize
 from nltk.corpus import stopwords
+from nltk.corpus import wordnet
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tokenize import RegexpTokenizer
-from nltk.corpus import wordnet
+
+
 ##############Book examle and practice#############
 #nltk.download()
 # from nltk.book import *
@@ -120,7 +119,7 @@ class testingGround:
         #     return self.word_map.get(word, word)
 
 
-class MyClass:
+class processInput:
     """Class to take in an input and return what that input means"""
     userInput = []
 
@@ -143,6 +142,7 @@ class MyClass:
         userInput = lemmated
         print("Individual Words:", userInput)
 
+
         # if (self.containsBRH() == True):
         #     print("The User wants to reserve a ticket.")
 
@@ -153,9 +153,9 @@ class MyClass:
         # else:
         #     print("No time given")
 
-
-
-
+    def returnlist(self):
+        global userInput
+        return userInput
 
     def getVerbs(self):
         global userInput
