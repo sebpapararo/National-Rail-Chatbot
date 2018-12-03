@@ -1,7 +1,7 @@
 import nltk
 import nltk, re, pprint
 import time, datetime
-from nltk import word_tokenize
+from nltk import word_tokenize, pos_tag
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tokenize import RegexpTokenizer
@@ -217,7 +217,7 @@ class MyClass:
                 time+=w
 
         if(time != ""):
-            return True, time
+            return True
         return False
 
 
@@ -234,9 +234,12 @@ class MyClass:
 
 
     def containsLoc(self):
+        global userInput
+        if 'Norwich' in userInput:
+            return True
+        return False
 
 
-        return True
 
 
     # def query(self):

@@ -86,3 +86,27 @@ from nlpu import *
 
 
 #--------------------------------------------------Chatbot knowledge base doing changing rules in one method
+class chatBotMain(KnowledgeEngine):
+
+
+    @Rule(Fact(greet = True))
+    def greet(self):
+        print("Hello there! What would you like to do?")
+
+
+    @Rule(Fact(book = True))
+    def wants_book(self):
+        print("Where would you like to go?")
+
+    @Rule(Fact(book=True),
+          Fact(location=True),
+          Fact(time=False))
+    def wants_book(self):
+        print("What time would you like to go?")
+
+
+    @Rule(Fact(book=True),
+          Fact(location=True),
+          Fact(time=True))
+    def wants_book(self):
+        print("YAY! you're going on a train!")

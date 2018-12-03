@@ -42,11 +42,15 @@ if __name__ == '__main__':
     # en.reset()  # Prepare the engine for the execution.
     # en.run()  # Run it!
 
-    engine = Chatbot()
+    engine = chatBotMain()
     engine.reset()
     engine.run()
-
-
+    engine.declare(Fact(greet = True, book = False, time = False, location = False))
+    print(engine.facts)
+    x = MyClass(input())
+    engine.modify(engine.facts[1], book = x.containsBRH(), time = x.containsTime() , location = x.containsLoc(), greet = False)
+    print(engine.facts)
+    print(engine.agenda)
 
 #https://www.nltk.org/book/ch05.html
 
