@@ -16,11 +16,12 @@ def index():
 if __name__ == '__main__':
     app.run(host='127.0.0.1', debug=True)
 
-    # y = testingGround()
-    #y.testing()
+    # x = input("Hi there, what would you like to do?")
+    # y = processInput(x)
+    # print(y)
 
-    # x = MyClass("Book a train please")
-    # x.getVerbs()
+
+
 
 
 #https://www.nltk.org/book/ch05.html
