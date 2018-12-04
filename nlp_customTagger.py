@@ -17,9 +17,9 @@ from nltk.corpus import wordnet
 
 tagged_sentences = nltk.corpus.treebank.tagged_sents()
 
-print(tagged_sentences[0])
-print("Tagged sentences: ", len(tagged_sentences))
-print("Tagged words:", len(nltk.corpus.treebank.tagged_words()))
+# print(tagged_sentences[0])
+# print("Tagged sentences: ", len(tagged_sentences))
+# print("Tagged words:", len(nltk.corpus.treebank.tagged_words()))
 
 
 def features(sentence, index):
@@ -45,27 +45,27 @@ def features(sentence, index):
     }
 
 
-import pprint
+# import pprint
+#
+# pprint.pprint(features(['This', 'is', 'a', 'sentence'], 2))
 
-pprint.pprint(features(['This', 'is', 'a', 'sentence'], 2))
-
-{'capitals_inside': False,
- 'has_hyphen': False,
- 'is_all_caps': False,
- 'is_all_lower': True,
- 'is_capitalized': False,
- 'is_first': False,
- 'is_last': False,
- 'is_numeric': False,
- 'next_word': 'sentence',
- 'prefix-1': 'a',
- 'prefix-2': 'a',
- 'prefix-3': 'a',
- 'prev_word': 'is',
- 'suffix-1': 'a',
- 'suffix-2': 'a',
- 'suffix-3': 'a',
- 'word': 'a'}
+# {'capitals_inside': False,
+#  'has_hyphen': False,
+#  'is_all_caps': False,
+#  'is_all_lower': True,
+#  'is_capitalized': False,
+#  'is_first': False,
+#  'is_last': False,
+#  'is_numeric': False,
+#  'next_word': 'sentence',
+#  'prefix-1': 'a',
+#  'prefix-2': 'a',
+#  'prefix-3': 'a',
+#  'prev_word': 'is',
+#  'suffix-1': 'a',
+#  'suffix-2': 'a',
+#  'suffix-3': 'a',
+#  'word': 'a'}
 
 
 def untag(tagged_sentence):
@@ -113,13 +113,24 @@ X_test, y_test = transform_to_dataset(test_sentences)
 print("Accuracy:", clf.score(X_test, y_test))
 
 
-def pos_tag(sentence):
+def Custom_pos_tag(sentence):
     tags = clf.predict([features(sentence, index) for index in range(len(sentence))])
     return zip(sentence, tags)
 
 
-print(tuple(pos_tag(word_tokenize('I would like to book a train ticket please'))))
+testSet = []
 
+testSet = Custom_pos_tag(word_tokenize('Hello, I would like to book a train ticket please'))
 
-print("Hello There!")
-# [('This', u'DT'), ('is', u'VBZ'), ('my', u'JJ'), ('friend', u'NN'), (',', u','), ('John', u'NNP'), ('.', u'.')]
+print(tuple(testSet))
+# print(tuple(pos_tag(word_tokenize('I would like to book a train ticket please\n'))))
+#
+# print(tuple(pos_tag(word_tokenize('Today I read a book\n'))))
+#
+# print(tuple(pos_tag(word_tokenize('I would like book train please\n'))))
+#
+# print(tuple(pos_tag(word_tokenize('I would like to book a train ticket to Norwich\n'))))
+#
+# print(tuple(pos_tag(word_tokenize('I live in Norwich\n'))))
+#
+# print(tuple(pos_tag(word_tokenize('Norwich is a wonderful city\n'))))

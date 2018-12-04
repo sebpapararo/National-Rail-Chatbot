@@ -7,7 +7,7 @@ from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import wordnet
 ##############Book examle and practice#############
-#nltk.download()
+# nltk.download()
 # from nltk.book import *
 #
 # def lexical_diversity(text):

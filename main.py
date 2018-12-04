@@ -23,7 +23,7 @@ if __name__ == '__main__':
     #y = testingGround()
     #y.testing()
 
-    #x = MyClass("I would like to book a train please at 13:00")
+    x = MyClass("I would like to book a train please at 13:00")
     #x.getVerbs()
     #x.query()
     #x.containsBRH()
