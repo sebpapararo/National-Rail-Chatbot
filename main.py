@@ -11,12 +11,25 @@ def index():
     return render_template('index.html')
 
 
+
+
+
 if __name__ == '__main__':
     app.run(host='127.0.0.1', debug=True)
 
     # x = input("Hi there, what would you like to do?")
     # y = processInput(x)
     # print(y)
+
+
+
+
+
+    # x = input("Hi there, what would you like to do?")
+
+    y = MyClass(x)
+    # print(y)
+
 
 
 

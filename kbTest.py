@@ -42,17 +42,18 @@ class trainBot(KnowledgeEngine):
         if 'yes' in uInput.returnlist():
             self.declare(Fact(correct='true'))
 
+            # Default response if it doesnt understand you
+            # @Rule()
+            # def unknown(self):
+            #     uInput = processInput(input("Sorry, I didn't understand that. Try again: "))
+            #     print(Fact)
+            #     if 'book' in uInput.returnlist():
+            #         self.declare(Fact(book='true'))
+            #     else:
+            #         self.unknown()
+
+
 engine = trainBot()
 engine.reset()  # Prepare the engine for the execution.
+# engine.declare(states(book='false', begin='true', hello='false', originGiven='false', destGiven='false', correct='false'))
 engine.run()  # Run it!
-
-
-# Default response if it doesnt understand you
-# @Rule()
-# def unknown(self):
-#     uInput = processInput(input("Sorry, I didn't understand that. Try again: "))
-#     print(Fact)
-#     if 'book' in uInput.returnlist():
-#         self.declare(Fact(book='true'))
-#     else:
-#         self.unknown()
