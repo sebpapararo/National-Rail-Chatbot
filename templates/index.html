@@ -7,21 +7,47 @@
     <link rel="stylesheet" type="text/css" href="static/main.css">
 </head>
 
-<body onload="onload()">
+<!--<body onload="onload()">-->
+<body>
 
 <h1>Group 17 - Train Booking Chatbot</h1>
 
 <div id="conversation">
 
+
     <div id="chatHistory">
 
-    </div>
-    <br>
+        {% for item in data %}
 
-    <form action="" onsubmit="updateChatHistory()">
+            {% if item.itemid % 2 == 0 %}
+                <h4>You: </h4>{{item.item}}<br><br>
+            {% else %}
+                <h4>Bot: </h4>{{item.item}}<br><br>
+            {% endif %}
+
+        {% endfor %}
+
+
+    </div>
+
+    <form action="/userUpdate" method="POST">
         <input name="inputBox" id="inputBox" placeholder="say to the bot... " autocomplete="off" autofocus>
         <input type="submit" value="Say it">
     </form>
+
+    <br>
+    <form action="/restartChat" method="POST">
+        <input type="submit" value="Restart Chat">
+    </form>
+
+
+    <!--<br>-->
+
+    <!--<form action="" onsubmit="updateChatHistory()">-->
+    <!--<input name="inputBox" id="inputBox" placeholder="say to the bot... " autocomplete="off" autofocus>-->
+    <!--<input type="submit" value="Say it">-->
+    <!--</form>-->
+
 
 </div>
 

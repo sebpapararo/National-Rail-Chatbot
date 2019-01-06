@@ -25,6 +25,10 @@ h2 {
     padding-bottom: 0.5em;
 }
 
+h4 {
+    display: inline;
+}
+
 ul.content > li {
     list-style: none;
     padding: 0.5em 1em;
