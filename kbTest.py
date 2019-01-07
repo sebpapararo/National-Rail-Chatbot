@@ -25,8 +25,6 @@ class trainBot(KnowledgeEngine):
     def _initial_action(self):
         yield Fact(begin='true')
         yield Fact(receivedInput='false')
-        yield Fact(unknown='false')
-
 
     # Beginning of the conversation
     @Rule(Fact(begin='true'))
