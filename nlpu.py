@@ -140,7 +140,7 @@ class processInput:
             lemmated.append(lem.lemmatize(q, "v"))
 
         userInput = lemmated
-        print("Individual Words:", userInput)
+        # print("Individual Words:", userInput)
 
 
         # if (self.containsBRH() == True):

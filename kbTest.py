@@ -7,9 +7,14 @@ dest = ""
 uInput = ""
 lastBotReply = ""
 
-# After a user response is supplied the engine carries out all functions where teh rules are met
+# After a user response is supplied the engine carries out all functions where the rules are met
 
 class trainBot(KnowledgeEngine):
+
+    # Default response if it doesnt understand you
+    def unknown(self):
+        from main import botUpdate
+        botUpdate("I'm sorry, I didn't understand that. Please try again.")
 
     def passReply(userInput):
         global uInput
@@ -20,41 +25,50 @@ class trainBot(KnowledgeEngine):
     def _initial_action(self):
         yield Fact(begin='true')
         yield Fact(receivedInput='false')
+        yield Fact(unknown='false')
 
 
     # Beginning of the conversation
     @Rule(Fact(begin='true'))
     def hello(self):
         from main import botUpdate
-        botUpdate("Hello, what can I help you with?")
         global lastBotReply
         lastBotReply = "Hello, what can I help you with?"
+        botUpdate(lastBotReply)
         self.modify(self.facts[1], begin="false")
 
     # Just received user input
     @Rule(Fact(receivedInput='true'))
     def waiting(self):
-        # print('it did something')
-        # print(uInput)
-
         global orig, dest, lastBotReply
-
         processedInput = processInput(uInput)
 
-        if 'book' in processedInput.returnlist():
-            self.declare(Fact(book='true'))
+        # Each if/case should have an else where the users response is unknown so it allows them to try again
 
-        if lastBotReply == "Where would you like to go?":
+        if lastBotReply in "Hello, what can I help you with?":
+            if 'book' in processedInput.returnlist():
+                self.declare(Fact(book='true'))
+            else:
+                self.unknown()
+
+        # Maybe add a check against a list of train stations to make sure its real
+        if lastBotReply == "Sure thing! Where would you like to go?":
             dest = uInput
             self.declare(Fact(destGiven="true"))
 
-        if lastBotReply == "Where are you going from?":
+        # Maybe add a check against a list of train stations to make sure its real
+        if lastBotReply == "Excellent! Where are you departing from?":
             orig = uInput
             self.declare(Fact(origGiven="true"))
 
-        if lastBotReply == 'You want to book a ticket to go from %s to %s is this correct yes or no?':
+        if lastBotReply == 'You want to book a ticket to go from %s to %s is this correct yes or no?' % (orig, dest):
             if 'yes' in processedInput.returnlist():
                 self.declare(Fact(correct='true'))
+            elif 'no' in processedInput.returnlist():
+                self.declare(Fact(correct='false'))
+            else:
+                self.unknown()
+
 
         engine.run()
 
@@ -62,37 +76,25 @@ class trainBot(KnowledgeEngine):
     @Rule(Fact(book='true'))
     def whereGo(self):
         from main import botUpdate
-        botUpdate("Where would you like to go?")
         global lastBotReply
-        lastBotReply = "Where would you like to go?"
+        lastBotReply = "Sure thing! Where would you like to go?"
+        botUpdate(lastBotReply)
 
     # They want to book a ticket, but no origin has been given
     @Rule(Fact(book='true'), Fact(destGiven="true"))
     def whereFrom(self):
         from main import botUpdate
-        botUpdate("Where are you going from?")
         global lastBotReply
-        lastBotReply = "Where are you going from?"
+        lastBotReply = "Excellent! Where are you departing from?"
+        botUpdate(lastBotReply)
 
     # They want to book a ticket and both an origin and destination have been given
     @Rule(AND(Fact(origGiven='true'), Fact(destGiven='true')))
     def confirmBookDetails(self):
-
         from main import botUpdate
-        botUpdate('You want to book a ticket to go from %s to %s is this correct yes or no?' % (orig, dest))
         global lastBotReply
-        lastBotReply = 'You want to book a ticket to go from %s to %s is this correct yes or no?'
-
-    # Default response if it doesnt understand you
-    # @Rule()
-    # def unknown(self):
-    #     uInput = processInput(input("Sorry, I didn't understand that. Try again: "))
-    #     print(Fact)
-    #     if 'book' in uInput.returnlist():
-    #         self.declare(Fact(book='true'))
-    #     else:
-    #         self.unknown()
-
+        lastBotReply = 'You want to book a ticket to go from %s to %s is this correct yes or no?' % (orig, dest)
+        botUpdate(lastBotReply)
 
 engine = trainBot()
 # engine.reset()  # Prepare the engine for the execution.

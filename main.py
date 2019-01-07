@@ -1,8 +1,7 @@
-from flask import Flask, render_template, request, g, redirect, jsonify
+from flask import Flask, render_template, request, g, redirect
 from kbTest import trainBot
 import sqlite3
 from pyknow import *
-from nlpu import *
 
 app = Flask(__name__)
 DATABASE = 'database.db'
@@ -117,7 +116,8 @@ def restartChat():
 
 if __name__ == '__main__':
 
-    engine.reset()
+    # engine.reset()
+    # engine.run()
     with app.app_context():
         restartChat()
 
