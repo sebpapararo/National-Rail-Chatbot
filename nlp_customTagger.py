@@ -1,10 +1,5 @@
-import nltk, re, pprint
-import time, datetime
-from nltk import word_tokenize, pos_tag
-from nltk.corpus import stopwords
-from nltk.stem.wordnet import WordNetLemmatizer
-from nltk.tokenize import RegexpTokenizer
-from nltk.corpus import wordnet
+import nltk
+from nltk import word_tokenize
 
 #This is tagging from a guide
 
@@ -103,8 +98,8 @@ clf = Pipeline([
     ('classifier', DecisionTreeClassifier(criterion='entropy'))
 ])
 
-clf.fit(X[:10000],
-        y[:10000])  # Use only the first 10K samples if you're running it multiple times. It takes a fair bit :)
+clf.fit(X[:7000],
+        y[:7000])  # Use only the first 10K samples if you're running it multiple times. It takes a fair bit :)
 
 print('Training completed')
 

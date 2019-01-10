@@ -1,14 +1,16 @@
-from flask import Flask, render_template, request, g, redirect
-from KB_main import trainBot
 import sqlite3
+
+from flask import Flask, render_template, request, g, redirect
 from pyknow import *
+
+from KB_main import *
 
 app = Flask(__name__)
 DATABASE = 'database.db'
-
 engine = trainBot()
 
-## Database Methods
+
+# Database Methods
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
@@ -46,12 +48,11 @@ def close_connection(exception):
         db.close()
 
 
-
 @app.route('/', methods=['GET', 'POST'])
 def index():
-
+    global engine
     # engine.reset()
-    engine.run()
+    # engine.run()
 
     query = "SELECT itemid, item FROM chatHist"
     result = query_db(query)
@@ -59,22 +60,21 @@ def index():
     return render_template('index.html', data=result)
 
 
-
-
 @app.route('/userUpdate', methods=['GET', 'POST'])
 def userUpdate():
+    global engine
     userInput = request.form.get('inputBox')
 
     query = 'INSERT INTO chatHist (item) VALUES("%s");' % (userInput)
     result = query_db(query)
     get_db().commit()
 
-    trainBot.passReply(userInput)
+    trainBot.passReply(userInput, engine)
     # engine.declare(Fact(receivedInput='true'))
-    engine.facts.duplication = True
-    engine.duplicate(engine.facts[2], receivedInput='true')
+    # engine.facts.duplication = True
+    # engine.duplicate(engine.facts[2], receivedInput='true')
     engine.run()
-    engine.duplicate(engine.facts[2], receivedInput='false')
+    # engine.duplicate(engine.facts[2], receivedInput='false')
 
     query = "SELECT itemid, item FROM chatHist"
     result = query_db(query)
@@ -82,6 +82,7 @@ def userUpdate():
     return redirect('/')
 
     # return render_template('index.html', data=result)
+
 
 @app.route('/botUpdate', methods=['GET', 'POST'])
 def botUpdate(botReply):
@@ -98,7 +99,7 @@ def botUpdate(botReply):
 
 @app.route('/restartChat', methods=['GET', 'POST'])
 def restartChat():
-
+    global engine
     query = 'DELETE FROM chatHist;'
     result = query_db(query)
     get_db().commit()
@@ -116,11 +117,9 @@ def restartChat():
 
 if __name__ == '__main__':
 
-    # engine.reset()
-    # engine.run()
     with app.app_context():
         restartChat()
-
+        engine.reset()
+        engine.run()
 
     app.run(host='127.0.0.1', debug=True)
-

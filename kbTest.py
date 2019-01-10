@@ -1,5 +1,4 @@
 from pyknow import *
-from nlpu import *
 
 # Global variables
 orig = ""
@@ -8,6 +7,7 @@ uInput = ""
 lastBotReply = ""
 
 # After a user response is supplied the engine carries out all functions where the rules are met
+
 
 class trainBot(KnowledgeEngine):
 
@@ -67,7 +67,6 @@ class trainBot(KnowledgeEngine):
             else:
                 self.unknown()
 
-
         engine.run()
 
     # They want to book a ticket, but no destination has been given
@@ -95,6 +94,3 @@ class trainBot(KnowledgeEngine):
         botUpdate(lastBotReply)
 
 engine = trainBot()
-# engine.reset()  # Prepare the engine for the execution.
-# engine.declare(states(book='false', begin='true', hello='false', originGiven='false', destGiven='false', correct='false'))
-# engine.run()  # Run it!
