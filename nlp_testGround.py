@@ -1,10 +1,7 @@
 from nltk import word_tokenize
+from nlp_customTagger import Custom_pos_tag
 
-from nlp_customTagger import *
-
-sentText = 'Hello, I would like to book a train ticket to Norwich from diss'
-
-testData = []
+# sentText = 'Hello, I would like to book a train ticket to Norwich from diss'
 
 # def findLocations(sentence):
 #     locs = []
@@ -22,10 +19,8 @@ testData = []
 #                 break
 #     return found
 
-
-
-testData = Custom_pos_tag(word_tokenize(sentText))
-copyData = Custom_pos_tag(word_tokenize(sentText))
+# testData = Custom_pos_tag(word_tokenize(sentText))
+# copyData = Custom_pos_tag(word_tokenize(sentText))
 
 # customplaces = findLocations(copyData)
 #

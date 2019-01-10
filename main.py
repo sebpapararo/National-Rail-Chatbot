@@ -1,9 +1,6 @@
 import sqlite3
-
 from flask import Flask, render_template, request, g, redirect
-from pyknow import *
-
-from KB_main import *
+from knowledgebase import *
 
 app = Flask(__name__)
 DATABASE = 'database.db'
@@ -50,10 +47,6 @@ def close_connection(exception):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    global engine
-    # engine.reset()
-    # engine.run()
-
     query = "SELECT itemid, item FROM chatHist"
     result = query_db(query)
 
@@ -65,30 +58,23 @@ def userUpdate():
     global engine
     userInput = request.form.get('inputBox')
 
-    query = 'INSERT INTO chatHist (item) VALUES("%s");' % (userInput)
-    result = query_db(query)
+    query = 'INSERT INTO chatHist (item) VALUES("%s");' % userInput
+    query_db(query)
     get_db().commit()
 
     trainBot.passReply(userInput, engine)
-    # engine.declare(Fact(receivedInput='true'))
-    # engine.facts.duplication = True
-    # engine.duplicate(engine.facts[2], receivedInput='true')
     engine.run()
-    # engine.duplicate(engine.facts[2], receivedInput='false')
 
     query = "SELECT itemid, item FROM chatHist"
-    result = query_db(query)
+    query_db(query)
 
     return redirect('/')
-
-    # return render_template('index.html', data=result)
 
 
 @app.route('/botUpdate', methods=['GET', 'POST'])
 def botUpdate(botReply):
-
-    query = 'INSERT INTO chatHist (item) VALUES("%s");' % (botReply)
-    result = query_db(query)
+    query = 'INSERT INTO chatHist (item) VALUES("%s");' % botReply
+    query_db(query)
     get_db().commit()
 
     query = "SELECT itemid, item FROM chatHist"
@@ -101,25 +87,21 @@ def botUpdate(botReply):
 def restartChat():
     global engine
     query = 'DELETE FROM chatHist;'
-    result = query_db(query)
+    query_db(query)
     get_db().commit()
 
     query = 'DELETE FROM sqlite_sequence WHERE name = "chatHist";'
-    result = query_db(query)
+    query_db(query)
     get_db().commit()
 
-    # engine = trainBot()
     engine.reset()
-    # engine.run()
+    engine.run()
 
     return redirect('/')
 
 
 if __name__ == '__main__':
-
     with app.app_context():
         restartChat()
-        engine.reset()
-        engine.run()
 
     app.run(host='127.0.0.1', debug=True)

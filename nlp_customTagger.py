@@ -101,7 +101,7 @@ clf = Pipeline([
 clf.fit(X[:7000],
         y[:7000])  # Use only the first 10K samples if you're running it multiple times. It takes a fair bit :)
 
-print('Training completed')
+print('Custom tagger training completed')
 
 X_test, y_test = transform_to_dataset(test_sentences)
 
@@ -115,7 +115,7 @@ def Custom_pos_tag(sentence):
 
 testSet = []
 
-testSet = Custom_pos_tag(word_tokenize('Hello, I would like to book a train ticket please'))
+# testSet = Custom_pos_tag(word_tokenize('Hello, I would like to book a train ticket please'))
 
 # print(tuple(testSet))
 # print(tuple(pos_tag(word_tokenize('I would like to book a train ticket please\n'))))

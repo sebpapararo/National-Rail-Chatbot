@@ -1,13 +1,10 @@
 import nltk
-import nltk, re, pprint
-import time, datetime
-from nltk import word_tokenize, pos_tag
+nltk.download()
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import wordnet
 ##############Book examle and practice#############
-# nltk.download()
 # from nltk.book import *
 #
 # def lexical_diversity(text):
