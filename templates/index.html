@@ -5,26 +5,51 @@
     <title>Group 17 Chatbot</title>
     <script type="text/javascript" src="static/main.js"></script>
     <link rel="stylesheet" type="text/css" href="static/main.css">
-
 </head>
-<body onload="displayChatHistory()">
 
-    <h1>Group 17 - Train Booking Chatbot</h1>
+<!--<body onload="onload()">-->
+<body>
 
-    <div id = "conversation">
+<h1>Group 17 - Train Booking Chatbot</h1>
 
-        <div id = "chatHistory">
-
-        </div>
+<div id="conversation">
 
 
-        <br>
-        <input name="inputBox" id="inputBox" placeholder="say to the bot... ">
-        <input type="button" value="Say it" onclick="updateChatHistory()">
+    <div id="chatHistory">
+
+        {% for item in data %}
+
+            {% if item.itemid % 2 == 0 %}
+                <h4>You: </h4>{{item.item}}<br><br>
+            {% else %}
+                <h4>Bot: </h4>{{item.item}}<br><br>
+            {% endif %}
+
+        {% endfor %}
+
 
     </div>
 
+    <form action="/userUpdate" method="POST">
+        <input name="inputBox" id="inputBox" placeholder="say to the bot... " autocomplete="off" autofocus>
+        <input type="submit" value="Say it">
+    </form>
 
+    <br>
+    <form action="/restartChat" method="POST">
+        <input type="submit" value="Restart Chat">
+    </form>
+
+
+    <!--<br>-->
+
+    <!--<form action="" onsubmit="updateChatHistory()">-->
+    <!--<input name="inputBox" id="inputBox" placeholder="say to the bot... " autocomplete="off" autofocus>-->
+    <!--<input type="submit" value="Say it">-->
+    <!--</form>-->
+
+
+</div>
 
 </body>
 </html>

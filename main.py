@@ -1,61 +1,126 @@
-from nlpu import *
-from kb import *
-from random import choice
+from flask import Flask, render_template, request, g, redirect
+from kbTest import trainBot
+import sqlite3
+from pyknow import *
 
-#from flask import Flask, render_template
+app = Flask(__name__)
+DATABASE = 'database.db'
 
-#app = Flask(__name__)
+engine = trainBot()
+
+## Database Methods
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+
+    def make_dicts(cursor, row):
+        return dict((cursor.description[idx][0], value)
+                    for idx, value in enumerate(row))
+
+    db.row_factory = make_dicts
+    return db
+
+
+def query_db(query, args=(), one=False):
+    cur = None
+    rv = None
+    try:
+
+        cur = get_db().execute(query, args)
+        rv = cur.fetchall()
+    except sqlite3.Error as e:
+        app.logger.info('Database error: %s' % e)
+    except Exception as e:
+        app.logger.info('Exception in query_db: %s' % e)
+    finally:
+        if cur:
+            cur.close()
+    return (rv[0] if rv else None) if one else rv
+
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 
 
 
-#@app.route('/', methods=['GET', 'POST'])
-#def index():
+@app.route('/', methods=['GET', 'POST'])
+def index():
 
-   #return render_template('index.html')
+    # engine.reset()
+    engine.run()
+
+    query = "SELECT itemid, item FROM chatHist"
+    result = query_db(query)
+
+    return render_template('index.html', data=result)
 
 
 
+
+@app.route('/userUpdate', methods=['GET', 'POST'])
+def userUpdate():
+    userInput = request.form.get('inputBox')
+
+    query = 'INSERT INTO chatHist (item) VALUES("%s");' % (userInput)
+    result = query_db(query)
+    get_db().commit()
+
+    trainBot.passReply(userInput)
+    # engine.declare(Fact(receivedInput='true'))
+    engine.facts.duplication = True
+    engine.duplicate(engine.facts[2], receivedInput='true')
+    engine.run()
+    engine.duplicate(engine.facts[2], receivedInput='false')
+
+    query = "SELECT itemid, item FROM chatHist"
+    result = query_db(query)
+
+    return redirect('/')
+
+    # return render_template('index.html', data=result)
+
+@app.route('/botUpdate', methods=['GET', 'POST'])
+def botUpdate(botReply):
+
+    query = 'INSERT INTO chatHist (item) VALUES("%s");' % (botReply)
+    result = query_db(query)
+    get_db().commit()
+
+    query = "SELECT itemid, item FROM chatHist"
+    result = query_db(query)
+
+    return render_template('index.html', data=result)
+
+
+@app.route('/restartChat', methods=['GET', 'POST'])
+def restartChat():
+
+    query = 'DELETE FROM chatHist;'
+    result = query_db(query)
+    get_db().commit()
+
+    query = 'DELETE FROM sqlite_sequence WHERE name = "chatHist";'
+    result = query_db(query)
+    get_db().commit()
+
+    # engine = trainBot()
+    engine.reset()
+    # engine.run()
+
+    return redirect('/')
 
 
 if __name__ == '__main__':
-    #app.run(host='127.0.0.1', debug=True)
 
-    #y = testingGround()
-    #y.testing()
-
-    x = MyClass("I would like to book a train please at 13:00")
-    #x.getVerbs()
-    #x.query()
-    #x.containsBRH()
-
-    # engine = RobotCrossStreet()
     # engine.reset()
-    # engine.declare(Light(color=choice(['green', 'yellow', 'blinking-yellow', 'red'])))
     # engine.run()
+    with app.app_context():
+        restartChat()
 
-    # kb = UserWantsTicket()
-    # kb.reset()
-    # kb.declare(Ticket(x.containsBRH()))
-    # kb.run()
 
-    # en = Greetings()
-    # en.reset()  # Prepare the engine for the execution.
-    # en.run()  # Run it!
+    app.run(host='127.0.0.1', debug=True)
 
-    engine = chatBotMain()
-    engine.reset()
-    engine.run()
-    engine.declare(Fact(greet = True, book = False, time = False, location = False))
-    print(engine.facts)
-    x = MyClass(input())
-    engine.modify(engine.facts[1], book = x.containsBRH(), time = x.containsTime() , location = x.containsLoc(), greet = False)
-    print(engine.facts)
-    print(engine.agenda)
-
-#https://www.nltk.org/book/ch05.html
-
-#https://www.nltk.org/book/ch07.html
-
-#https://stackoverflow.com/questions/33318975/how-to-get-common-tag-pattern-for-sentences-list-in-python-with-nltk
-
-#https://towardsdatascience.com/a-practitioners-guide-to-natural-language-processing-part-i-processing-understanding-text-9f4abfd13e72
