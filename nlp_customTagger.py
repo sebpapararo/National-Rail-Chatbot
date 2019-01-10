@@ -77,8 +77,8 @@ cutoff = int(.75 * len(tagged_sentences))
 training_sentences = tagged_sentences[:cutoff]
 test_sentences = tagged_sentences[cutoff:]
 
-print(len(training_sentences))  # 2935
-print(len(test_sentences)) # 979
+# print(len(training_sentences))  # 2935
+# print(len(test_sentences)) # 979
 
 
 def transform_to_dataset(tagged_sentences):
@@ -110,7 +110,7 @@ print('Training completed')
 
 X_test, y_test = transform_to_dataset(test_sentences)
 
-print("Accuracy:", clf.score(X_test, y_test))
+# print("Accuracy:", clf.score(X_test, y_test))
 
 
 def Custom_pos_tag(sentence):
@@ -122,7 +122,7 @@ testSet = []
 
 testSet = Custom_pos_tag(word_tokenize('Hello, I would like to book a train ticket please'))
 
-print(tuple(testSet))
+# print(tuple(testSet))
 # print(tuple(pos_tag(word_tokenize('I would like to book a train ticket please\n'))))
 #
 # print(tuple(pos_tag(word_tokenize('Today I read a book\n'))))

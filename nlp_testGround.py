@@ -13,7 +13,7 @@ from nltk.corpus import wordnet
 
 
 
-sentText = 'Hello, I would like to book a train ticket to norwich from Diss'
+sentText = 'Hello, I would like to book a train ticket to Norwich from diss'
 
 testData = []
 
@@ -41,6 +41,6 @@ testData = Custom_pos_tag(word_tokenize(sentText))
 copyData = Custom_pos_tag(word_tokenize(sentText))
 
 customplaces = findLocations(copyData)
-
-print(tuple(testData))
-print("Locations found: ",customplaces)
+#
+# print(tuple(testData))
+# print("Locations found: ",customplaces)

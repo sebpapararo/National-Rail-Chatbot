@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, g, redirect
-from kbTest import trainBot
+from KB_main import trainBot
 import sqlite3
 from pyknow import *
 
