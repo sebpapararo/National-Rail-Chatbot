@@ -1,5 +1,6 @@
 import nltk
 from nltk import word_tokenize
+import re
 #This is tagging from a guide
 
 #https://nlpforhackers.io/training-pos-tagger/
@@ -75,18 +76,59 @@ def Custom_pos_tag(sentence):
     tags = clf.predict([features(sentence, index) for index in range(len(sentence))])
     return zip(sentence, tags)
 
-def findLocations(sentence):
+def findStations(sentence):
     locs = []
     found = []
-    sent = untag(sentence)
+    # sent = untag(sentence)
     # sent = word_tokenize(sentence)
-    with open('GBstations/allstations.txt', 'r') as allStations:
+    with open('allstations.txt', 'r') as allStations:
         data = allStations.readlines()
     for line in data:
         locs = line.split(", ")
-    for w in sent:
+    for index, w in enumerate(sentence):
         for l in locs:
-            if(w.lower() == l.lower()):
-                found.append(w)
+            if(w[0].lower() == l.lower()):
+                found.append(sentence[index-1])
+                found.append(sentence[index])
                 break
     return found
+
+def isRealStation(station):
+    locs = []
+    with open('allstations.txt', 'r') as allStations:
+        data = allStations.readlines()
+    for line in data:
+        locs = line.split(", ")
+    for l in locs:
+        if(station.lower() == l.lower()):
+            return True
+    return False
+
+def isTimeFormat(time):
+    rex = re.compile("^[0-9]{2}[:][0-9]{2}$")
+    if rex.match(time):
+        return True
+    else:
+        return False
+
+def isValidTime(time):
+    rex = re.compile("^[0-2][0-9][:][0-5][0-9]$")
+    if rex.match(time):
+        return True
+    else:
+        return False
+
+def isDateFormat(date):
+    rex = re.compile("^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{2}$")
+    if rex.match(date):
+        return True
+    else:
+        return False
+
+def wantsTicket(input):
+    if ('book', 'VB') or ('ticket', 'NN') in input:
+        return True
+    return False
+
+
+
