@@ -1,5 +1,7 @@
 import sqlite3
+
 from flask import Flask, render_template, request, g, redirect
+
 from knowledgebase import *
 
 app = Flask(__name__)
@@ -47,7 +49,7 @@ def close_connection(exception):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    query = "SELECT itemid, item FROM chatHist"
+    query = "SELECT itemid, whosaid, item FROM chatHist"
     result = query_db(query)
 
     return render_template('index.html', data=result)
@@ -58,7 +60,7 @@ def userUpdate():
     global engine
     userInput = request.form.get('inputBox')
 
-    query = 'INSERT INTO chatHist (item) VALUES("%s");' % userInput
+    query = 'INSERT INTO chatHist (whosaid, item) VALUES("You: ","%s");' % userInput
     query_db(query)
     get_db().commit()
 
@@ -73,7 +75,7 @@ def userUpdate():
 
 @app.route('/botUpdate', methods=['GET', 'POST'])
 def botUpdate(botReply):
-    query = 'INSERT INTO chatHist (item) VALUES("%s");' % botReply
+    query = 'INSERT INTO chatHist (whosaid, item) VALUES("Bot: ", "%s");' % botReply
     query_db(query)
     get_db().commit()
 

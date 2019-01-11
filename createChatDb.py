@@ -2,11 +2,9 @@ import os
 import sqlite3
 
 from flask import Flask
-from flask_bcrypt import Bcrypt
 
 DATABASE = 'database.db'
 app = Flask(__name__)
-bcrypt = Bcrypt(app)
 
 
 def create():
@@ -16,6 +14,7 @@ def create():
     c.execute('''
         CREATE TABLE chatHist (
             itemid integer PRIMARY KEY AUTOINCREMENT,
+            whosaid varchar,
             item varchar
         );
     ''')

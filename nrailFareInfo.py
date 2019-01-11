@@ -1,18 +1,21 @@
-from bs4 import BeautifulSoup
 from urllib.request import urlopen
-import re
 
-origin = 'Chelmsford'
+from bs4 import BeautifulSoup
+
+# The dates and times will need to be formatted after being passed in
+
+
+origin = 'Diss'
 origin = origin.replace(' ', '%20')
 destination = 'Norwich'
 destination = destination.replace(' ', '%20')
 # Date is in format ddmmyy
-originDepDate = '060119'
+originDepDate = '120119'
 # Time is in 24 hr format like hhmm
 originDepTime = '1315'
 # If they are looking for a return ticket set boolean to True and fill out other 2 fields
 wantsReturn = True
-returnDepDate = '100119'
+returnDepDate = '130119'
 returnDepTime = '2145'
 
 

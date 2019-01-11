@@ -1,4 +1,5 @@
 from pyknow import *
+
 from nlpu import *
 
 # Global Variables
@@ -6,6 +7,8 @@ lastBotReply = 0
 uInput = ''
 orig = ''
 dest = ''
+origDepDate = ''
+origDepTime = ''
 
 
 class information(Fact):
@@ -13,8 +16,8 @@ class information(Fact):
 
     origin = Field(str, mandatory=True)
     destination = Field(str, mandatory=True)
-    originDepDate = Field(str)
-    originDepTime = Field(str)
+    originDepDate = Field(str, mandatory=True)
+    originDepTime = Field(str, mandatory=True)
 
     wantsReturn = Field(bool, default=False)
     returnDepDate = Field(str)
@@ -36,7 +39,8 @@ class trainBot(KnowledgeEngine):
                 0: 'get-human-answer',
                 1: 'receive-origin',
                 2: 'receive-destination',
-                3: 'is-correct'
+                3: 'is-correct',
+                4: 'receive-origin-dep-date'
             }
             return switcher.get(lastBotReply)
 
@@ -49,7 +53,8 @@ class trainBot(KnowledgeEngine):
 
     @DefFacts()
     def bot_rules(self):
-        yield information(booking=False, origin='', destination='', wantsReturn=False, isCorrect=False)
+        yield information(booking=False, wantsReturn=False, isCorrect=False, origin='', destination='',
+                          originDepDate='', originDepTime='')
 
     @Rule()
     def startup(self):
@@ -57,7 +62,7 @@ class trainBot(KnowledgeEngine):
         global lastBotReply
         lastBotReply = 0
         botUpdate('Hello, how may I help you today?')
-        # botUpdate('e.g. Can I book a train ticket, Get trains times for...')
+        botUpdate('e.g. Can I book a train ticket, Get trains times for...')
 
     # Do they want to book a ticket
     @Rule(AS.f1 << Action('get-human-answer'),
@@ -101,7 +106,7 @@ class trainBot(KnowledgeEngine):
     # Gets the destination
     @Rule(AS.f1 << Action('get-human-answer'),
           AS.f2 << information(booking=True, destination=''))
-    def get_human_destination(self, f1, f2):
+    def get_human_destination(self, f1):
         self.retract(f1)
         from main import botUpdate
         global lastBotReply
@@ -116,6 +121,26 @@ class trainBot(KnowledgeEngine):
         self.modify(f2, destination=answer)
         global dest
         dest = uInput
+        self.declare(Action('get-human-answer'))
+
+    # Gets the origin departure date
+    @Rule(AS.f1 << Action('get-human-answer'),
+          AS.f2 << information(booking=True, originDepDate=''))
+    def get_origin_dep_date(self, f1):
+        self.retract(f1)
+        from main import botUpdate
+        global lastBotReply
+        lastBotReply = 4
+        botUpdate('What date would you like to go? Please enter in dd/mm/yy format')
+
+    # Receives the origin departure date
+    @Rule(AS.f1 << Action('receive-origin-dep-date'),
+          AS.f2 << information(booking=True, originDepDate=''))
+    def receive_origin_dep_date(self, f2):
+        answer = uInput
+        self.modify(f2, originDepDate=answer)
+        global origDepDate
+        origDepDate = uInput
         self.declare(Action('get-human-answer'))
 
     # Do they want a return
@@ -137,19 +162,20 @@ class trainBot(KnowledgeEngine):
     @Rule(AS.f1 << Action('check-info'), AS.f2 << information(
         booking=MATCH.book,
         origin=MATCH.org,
-        destination=MATCH.dest
-        # originDepDate=MATCH.orgDepDate,
+        destination=MATCH.dest,
+        originDepDate=MATCH.orgDepDate,
         # originDepTime=MATCH.orgDepTime,
         # wantsReturn=MATCH.wantsRet,
         # returnDepDate=MATCH.retDepDate,
         # returnDepTime=MATCH.retDepTime
                                ))
-    def check_info(self, f1, f2, book, org, dest):
+    def check_info(self, f1, org, dest, orgDepDate):
         self.retract(f1)
         from main import botUpdate
         global lastBotReply
         lastBotReply = 3
-        botUpdate('You want to book a ticket to go from %s to %s is this correct yes or no?' % (org, dest))
+        botUpdate('You want to book a ticket to go from %s to %s on %s.' % (org, dest, orgDepDate))
+        botUpdate('Is this correct yes or no?')
 
     @Rule(AS.f1 << Action('is-correct'),
           AS.f2 << information(isCorrect=False))
