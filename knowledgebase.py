@@ -40,13 +40,13 @@ class trainBot(KnowledgeEngine):
                 1: 'receive-origin',
                 2: 'receive-destination',
                 3: 'is-correct',
-                4: 'receive-origin-dep-date'
+                4: 'receive-origin-dep-date',
+                5: 'receive-origin-dep-time'
             }
             return switcher.get(lastBotReply)
 
         global lastBotReply
         self.declare(Action(switch_demo(lastBotReply)))
-
 
     def yes_or_no(self, question):
         return input(question).upper().startswith('Y')
@@ -86,7 +86,7 @@ class trainBot(KnowledgeEngine):
     # Asks the origin
     @Rule(AS.f1 << Action('get-human-answer'),
           AS.f2 << information(booking=True, origin=''))
-    def get_human_origin(self, f1, f2):
+    def get_human_origin(self, f1):
         self.retract(f1)
         from main import botUpdate
         global lastBotReply
@@ -98,7 +98,7 @@ class trainBot(KnowledgeEngine):
           AS.f2 << information(booking=True, origin=''))
     def receive_origin(self, f2):
         answer = uInput
-        self.modify(f2, origin = answer)
+        self.modify(f2, origin=answer)
         global orig
         orig = uInput
         self.declare(Action('get-human-answer'))
@@ -131,7 +131,7 @@ class trainBot(KnowledgeEngine):
         from main import botUpdate
         global lastBotReply
         lastBotReply = 4
-        botUpdate('What date would you like to go? Please enter in dd/mm/yy format')
+        botUpdate('What date would you like to go? Please enter in dd/mm/yy format.')
 
     # Receives the origin departure date
     @Rule(AS.f1 << Action('receive-origin-dep-date'),
@@ -143,6 +143,26 @@ class trainBot(KnowledgeEngine):
         origDepDate = uInput
         self.declare(Action('get-human-answer'))
 
+    # Gets the origin departure time
+    @Rule(AS.f1 << Action('get-human-answer'),
+          AS.f2 << information(booking=True, originDepTime=''))
+    def get_origin_dep_time(self, f1):
+        self.retract(f1)
+        from main import botUpdate
+        global lastBotReply
+        lastBotReply = 5
+        botUpdate('What time would you like depart? Please enter in hh:mm 24 hr format.')
+
+    # Receives the origin departure time
+    @Rule(AS.f1 << Action('receive-origin-dep-time'),
+          AS.f2 << information(booking=True, originDepTime=''))
+    def receive_origin_dep_time(self, f2):
+        answer = uInput
+        self.modify(f2, originDepTime=answer)
+        global origDepTime
+        origDepTime = uInput
+        self.declare(Action('get-human-answer'))
+
     # Do they want a return
     # @Rule(AS.f1 << Action('get-human-answer'),
     #       AS.f2 << information(booking=True, wants))
@@ -152,7 +172,10 @@ class trainBot(KnowledgeEngine):
     @Rule(AS.f1 << Action('get-human-answer'),
           AS.f2 << information(booking=True),
           NOT(information(origin='')),
-          NOT(information(destination=''))
+          NOT(information(destination='')),
+          NOT(information(originDepDate='')),
+          NOT(information(originDepTime=''))
+
           )
     def has_everything(self, f1):
         self.retract(f1)
@@ -164,22 +187,23 @@ class trainBot(KnowledgeEngine):
         origin=MATCH.org,
         destination=MATCH.dest,
         originDepDate=MATCH.orgDepDate,
-        # originDepTime=MATCH.orgDepTime,
+        originDepTime=MATCH.orgDepTime
         # wantsReturn=MATCH.wantsRet,
         # returnDepDate=MATCH.retDepDate,
         # returnDepTime=MATCH.retDepTime
                                ))
-    def check_info(self, f1, org, dest, orgDepDate):
+    def check_info(self, f1, org, dest, orgDepDate, orgDepTime):
         self.retract(f1)
         from main import botUpdate
         global lastBotReply
         lastBotReply = 3
-        botUpdate('You want to book a ticket to go from %s to %s on %s.' % (org, dest, orgDepDate))
+        botUpdate('You want to book a ticket to go from %s to %s on %s at %s.' % (org, dest, orgDepDate, orgDepTime))
         botUpdate('Is this correct yes or no?')
 
     @Rule(AS.f1 << Action('is-correct'),
           AS.f2 << information(isCorrect=False))
-    def receive_is_correct(self, f2):
+    def receive_is_correct(self, f1, f2):
+        self.retract(f1)
         answer = uInput
         if answer == ('yes' or 'y' or 'Y'):
             self.modify(f2, isCorrect=True)
