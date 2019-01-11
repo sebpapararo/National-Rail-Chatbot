@@ -31,7 +31,7 @@ class Action(Fact):
 
 class trainBot(KnowledgeEngine):
 
-    def passReply(userInput, self):
+    def passReply(userInput, engine):
         global uInput
         uInput = userInput
         def switch_demo(lastbotreply):
@@ -46,7 +46,7 @@ class trainBot(KnowledgeEngine):
             return switcher.get(lastBotReply)
 
         global lastBotReply
-        self.declare(Action(switch_demo(lastBotReply)))
+        engine.declare(Action(switch_demo(lastBotReply)))
 
     def yes_or_no(self, question):
         return input(question).upper().startswith('Y')
@@ -66,28 +66,30 @@ class trainBot(KnowledgeEngine):
 
     # Do they want to book a ticket
     @Rule(AS.f1 << Action('get-human-answer'),
-          AS.f2 << information(booking = False))
-    def get_human_answer(self, f1, f2):
+          AS.f2 << information(booking=False))
+    def receive_human_answer(self, f1, f2):
         self.retract(f1)
-        # print("Would you like to book a ticket?")
         question = uInput
         res = tuple(Custom_pos_tag(word_tokenize(question)))
 
         if ('book', 'VB') in res:
             print("Booking = True")
-            self.modify(f2, booking = True)
+            self.modify(f2, booking=True)
             self.declare(Action('get-human-answer'))
-            # print(res)
         else:
+            self.modify(f2, booking=False)
             self.declare(Action('unknown-input'))
-
-        # print(findLocations(res))
 
     # Asks the origin
     @Rule(AS.f1 << Action('get-human-answer'),
           AS.f2 << information(booking=True, origin=''))
-    def get_human_origin(self, f1):
-        self.retract(f1)
+    def get_human_origin(self, f1, f2):
+        try:
+            self.retract(f1)
+            self.retract(f2)
+        except:
+            pass
+
         from main import botUpdate
         global lastBotReply
         lastBotReply = 1
@@ -96,7 +98,12 @@ class trainBot(KnowledgeEngine):
     # Receives the origin
     @Rule(AS.f1 << Action('receive-origin'),
           AS.f2 << information(booking=True, origin=''))
-    def receive_origin(self, f2):
+    def receive_origin(self, f1, f2):
+        try:
+            self.retract(f1)
+        except:
+            pass
+
         answer = uInput
         self.modify(f2, origin=answer)
         global orig
@@ -106,8 +113,13 @@ class trainBot(KnowledgeEngine):
     # Gets the destination
     @Rule(AS.f1 << Action('get-human-answer'),
           AS.f2 << information(booking=True, destination=''))
-    def get_human_destination(self, f1):
-        self.retract(f1)
+    def get_human_destination(self, f1, f2):
+        try:
+            self.retract(f1)
+            self.retract(f2)
+        except:
+            pass
+
         from main import botUpdate
         global lastBotReply
         lastBotReply = 2
@@ -116,7 +128,12 @@ class trainBot(KnowledgeEngine):
     # Receives the destination
     @Rule(AS.f1 << Action('receive-destination'),
           AS.f2 << information(booking=True, destination=''))
-    def receive_destination(self, f2):
+    def receive_destination(self, f1, f2):
+        try:
+            self.retract(f1)
+        except:
+            pass
+
         answer = uInput
         self.modify(f2, destination=answer)
         global dest
@@ -126,8 +143,13 @@ class trainBot(KnowledgeEngine):
     # Gets the origin departure date
     @Rule(AS.f1 << Action('get-human-answer'),
           AS.f2 << information(booking=True, originDepDate=''))
-    def get_origin_dep_date(self, f1):
-        self.retract(f1)
+    def get_origin_dep_date(self, f1, f2):
+        try:
+            self.retract(f1)
+            self.retract(f2)
+        except:
+            pass
+
         from main import botUpdate
         global lastBotReply
         lastBotReply = 4
@@ -136,7 +158,12 @@ class trainBot(KnowledgeEngine):
     # Receives the origin departure date
     @Rule(AS.f1 << Action('receive-origin-dep-date'),
           AS.f2 << information(booking=True, originDepDate=''))
-    def receive_origin_dep_date(self, f2):
+    def receive_origin_dep_date(self, f1, f2):
+        try:
+            self.retract(f1)
+        except:
+            pass
+
         answer = uInput
         self.modify(f2, originDepDate=answer)
         global origDepDate
@@ -146,8 +173,13 @@ class trainBot(KnowledgeEngine):
     # Gets the origin departure time
     @Rule(AS.f1 << Action('get-human-answer'),
           AS.f2 << information(booking=True, originDepTime=''))
-    def get_origin_dep_time(self, f1):
-        self.retract(f1)
+    def get_origin_dep_time(self, f1, f2):
+        try:
+            self.retract(f1)
+            self.retract(f2)
+        except:
+            pass
+
         from main import botUpdate
         global lastBotReply
         lastBotReply = 5
@@ -156,7 +188,12 @@ class trainBot(KnowledgeEngine):
     # Receives the origin departure time
     @Rule(AS.f1 << Action('receive-origin-dep-time'),
           AS.f2 << information(booking=True, originDepTime=''))
-    def receive_origin_dep_time(self, f2):
+    def receive_origin_dep_time(self, f1, f2):
+        try:
+            self.retract(f1)
+        except:
+            pass
+
         answer = uInput
         self.modify(f2, originDepTime=answer)
         global origDepTime
@@ -175,10 +212,14 @@ class trainBot(KnowledgeEngine):
           NOT(information(destination='')),
           NOT(information(originDepDate='')),
           NOT(information(originDepTime=''))
-
           )
-    def has_everything(self, f1):
-        self.retract(f1)
+    def has_everything(self, f1, f2):
+        try:
+            self.retract(f1)
+            self.retract(f2)
+        except:
+            pass
+
         print('It has everything')
         self.declare(Action('check-info'))
 
@@ -192,8 +233,13 @@ class trainBot(KnowledgeEngine):
         # returnDepDate=MATCH.retDepDate,
         # returnDepTime=MATCH.retDepTime
                                ))
-    def check_info(self, f1, org, dest, orgDepDate, orgDepTime):
-        self.retract(f1)
+    def check_info(self, f1, f2, org, dest, orgDepDate, orgDepTime):
+        try:
+            self.retract(f1)
+            self.retract(f2)
+        except:
+            pass
+
         from main import botUpdate
         global lastBotReply
         lastBotReply = 3
@@ -203,17 +249,27 @@ class trainBot(KnowledgeEngine):
     @Rule(AS.f1 << Action('is-correct'),
           AS.f2 << information(isCorrect=False))
     def receive_is_correct(self, f1, f2):
-        self.retract(f1)
+        try:
+            self.retract(f1)
+        except:
+            pass
+
         answer = uInput
         if answer == ('yes' or 'y' or 'Y'):
             self.modify(f2, isCorrect=True)
             print('Ready to request actual data!')
-
+        else:
+            self.modify(f2, isCorrect=False)
             # self.declare(Action('get-human-answer'))
 
     @Rule(AS.f1 << Action('determine-another-question'))
     def another_question(self, f1):
-        self.retract(f1)
+        try:
+            self.retract(f1)
+
+        except:
+            pass
+
         if not self.yes_or_no("Do you have another question?"):
             print("Thanks for using me, and I hope everything worked sufficiently")
         else:
@@ -222,7 +278,11 @@ class trainBot(KnowledgeEngine):
 
     @Rule(AS.f1 << Action('unknown-input'))
     def unknown_input(self, f1):
-        self.retract(f1)
+        try:
+            self.retract(f1)
+        except:
+            pass
+
         from main import botUpdate
         botUpdate("I'm sorry, I didn't understand that. Please try again.")
         # print("I'm sorry, I didn't understand that. Please try again.")
