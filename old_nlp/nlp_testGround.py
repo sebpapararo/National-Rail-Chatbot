@@ -1,6 +1,3 @@
-from nltk import word_tokenize
-from nlp_customTagger import Custom_pos_tag
-
 # sentText = 'Hello, I would like to book a train ticket to Norwich from diss'
 
 # def findLocations(sentence):

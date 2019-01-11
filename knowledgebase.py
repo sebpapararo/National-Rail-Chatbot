@@ -1,5 +1,5 @@
 from pyknow import *
-from nlp_testGround import *
+from nlpu import *
 
 # Global Variables
 lastBotReply = 0
