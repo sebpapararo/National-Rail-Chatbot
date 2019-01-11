@@ -9,17 +9,20 @@ orig = ''
 dest = ''
 origDepDate = ''
 origDepTime = ''
-
+retDepDate = ''
+retDepTime = ''
+wantsRet = False
 
 class information(Fact):
     booking = Field(bool, default=False)
 
-    origin = Field(str, mandatory=True)
-    destination = Field(str, mandatory=True)
-    originDepDate = Field(str, mandatory=True)
-    originDepTime = Field(str, mandatory=True)
+    origin = Field(str)
+    destination = Field(str)
+    originDepDate = Field(str)
+    originDepTime = Field(str)
 
-    wantsReturn = Field(bool, default=False)
+    askedReturn = Field(bool)
+    wantsReturn = Field(bool)
     returnDepDate = Field(str)
     returnDepTime = Field(str)
 
@@ -42,7 +45,10 @@ class trainBot(KnowledgeEngine):
                 3: 'is-correct',
                 4: 'receive-origin-dep-date',
                 5: 'receive-origin-dep-time',
-                6: 'request-data'
+                6: 'request-data',
+                7: 'want-return',
+                8: 'receive-return-dep-date',
+                9: 'receive-return-dep-time'
             }
             return switcher.get(lastBotReply)
 
@@ -54,8 +60,8 @@ class trainBot(KnowledgeEngine):
 
     @DefFacts()
     def bot_rules(self):
-        yield information(booking=False, wantsReturn=False, isCorrect=False, origin='', destination='',
-                          originDepDate='', originDepTime='')
+        yield information(booking=False, isCorrect=False, origin='', destination='', wantsReturn=False, askedReturn=False,
+                          originDepDate='', originDepTime='', returnDepDate='', returnDepTime='')
 
     @Rule()
     def startup(self):
@@ -74,7 +80,7 @@ class trainBot(KnowledgeEngine):
         res = tuple(Custom_pos_tag(word_tokenize(question)))
 
         if ('book', 'VB') in res:
-            print("Booking = True")
+            # print("Booking = True")
             self.modify(f2, booking=True)
             self.declare(Action('get-human-answer'))
         else:
@@ -153,7 +159,7 @@ class trainBot(KnowledgeEngine):
             from main import botUpdate
             global lastBotReply
             lastBotReply = 4
-            botUpdate('What date would you like to go? Please enter in dd/mm/yy format.')
+            botUpdate('What date would you like to depart? Please enter in dd/mm/yy format.')
 
     # Receives the origin departure date
     @Rule(AS.f1 << Action('receive-origin-dep-date'),
@@ -201,9 +207,82 @@ class trainBot(KnowledgeEngine):
             self.declare(Action('get-human-answer'))
 
     # Do they want a return
-    # @Rule(AS.f1 << Action('get-human-answer'),
-    #       AS.f2 << information(booking=True, wants))
-    # def wantReturn(self, f1 , f2):
+    @Rule(AS.f1 << Action('get-human-answer'),
+          AS.f2 << information(booking=True),
+          NOT(information(origin='')),
+          NOT(information(destination='')),
+          NOT(information(originDepDate='')),
+          NOT(information(originDepTime='')),
+          information(askedReturn=False),
+          information(wantsReturn=False)
+          )
+    def getWantReturn(self, f1, f2):
+        self.retract(f1)
+        from main import botUpdate
+        global lastBotReply
+        lastBotReply = 7
+        botUpdate('Would you like a return ticket as well, yes or no?')
+
+    # Do they want a return
+    @Rule(AS.f1 << Action('want-return'),
+          AS.f2 << information(booking=True, askedReturn=False, wantsReturn=False),
+          NOT(information(origin='')),
+          NOT(information(destination='')),
+          NOT(information(originDepDate='')),
+          NOT(information(originDepTime='')),
+          )
+    def receiveWantReturn(self, f1, f2):
+        self.retract(f1)
+        if uInput == ('yes' or 'y' or 'Y'):
+            global wantsRet
+            wantsRet = True
+            self.modify(f2, wantsReturn=True, askedReturn=True)
+        else:
+            self.modify(f2, askedReturn=True)
+        self.declare(Action('get-human-answer'))
+
+    # Gets the return departure date
+    @Rule(AS.f1 << Action('get-human-answer'),
+          AS.f2 << information(booking=True, wantsReturn=True, returnDepDate=''))
+    def get_return_dep_date(self, f1, f2):
+        self.retract(f1)
+        from main import botUpdate
+        global lastBotReply
+        lastBotReply = 8
+        botUpdate('What date would you like to return on? Please enter in dd/mm/yy format.')
+
+    # Receives the return departure date
+    @Rule(AS.f1 << Action('receive-return-dep-date'),
+          AS.f2 << information(booking=True, wantsReturn=True, returnDepDate=''))
+    def receive_return_dep_date(self, f1, f2):
+        self.retract(f1)
+        answer = uInput
+        self.modify(f2, returnDepDate=answer)
+        global retDepDate
+        retDepDate = uInput
+        self.declare(Action('get-human-answer'))
+
+    # Gets the return departure time
+    @Rule(AS.f1 << Action('get-human-answer'),
+          AS.f2 << information(booking=True, wantsReturn=True, returnDepTime=''))
+    def get_return_dep_time(self, f1, f2):
+        self.retract(f1)
+        from main import botUpdate
+        global lastBotReply
+        lastBotReply = 9
+        botUpdate('What time would you like your return ticket to be? Please enter in hh:mm 24 hr format.')
+
+    # Receives the return departure time
+    @Rule(AS.f1 << Action('receive-return-dep-time'),
+          AS.f2 << information(booking=True, wantsReturn=True, returnDepTime=''))
+    def receive_return_dep_time(self, f1, f2):
+        self.retract(f1)
+        answer = uInput
+        self.modify(f2, returnDepTime=answer)
+        global retDepTime
+        retDepTime = uInput
+        self.declare(Action('get-human-answer'))
+
 
     # Has everything
     @Rule(AS.f1 << Action('get-human-answer'),
@@ -211,37 +290,37 @@ class trainBot(KnowledgeEngine):
           NOT(information(origin='')),
           NOT(information(destination='')),
           NOT(information(originDepDate='')),
-          NOT(information(originDepTime=''))
+          NOT(information(originDepTime='')),
+          OR(AND(information(wantsReturn=True), NOT(information(retDepDate='')), NOT(information(retDepTime=''))),
+             AND(information(wantsReturn=False), information(askedReturn=True)))
           )
     def has_everything(self, f1, f2):
-        try:
-            self.retract(f1)
-            # self.retract(f2)
-        except:
-            pass
-
-        print('It has everything')
-        self.declare(Action('check-info'))
-
-    @Rule(AS.f1 << Action('check-info'), AS.f2 << information(
-        booking=MATCH.book,
-        origin=MATCH.org,
-        destination=MATCH.dest,
-        originDepDate=MATCH.orgDepDate,
-        originDepTime=MATCH.orgDepTime
-        # wantsReturn=MATCH.wantsRet,
-        # returnDepDate=MATCH.retDepDate,
-        # returnDepTime=MATCH.retDepTime
-                               ))
-    def check_info(self, f1, f2, org, dest, orgDepDate, orgDepTime):
-
         self.retract(f1)
         # self.retract(f2)
+        # print('It has everything')
+        self.declare(Action('check-info'))
+
+    @Rule(AS.f1 << Action('check-info'),
+          AS.f2 << information(
+            booking=MATCH.book,
+            origin=MATCH.org,
+            destination=MATCH.dest,
+            originDepDate=MATCH.orgDepDate,
+            originDepTime=MATCH.orgDepTime,
+            wantsReturn=MATCH.wantsRet,
+            returnDepDate=MATCH.retDepDate,
+            returnDepTime=MATCH.retDepTime
+            )
+          )
+    def check_info(self, f1, f2, org, dest, orgDepDate, orgDepTime, wantsRet, retDepDate, retDepTime):
+        self.retract(f1)
         from main import botUpdate
         global lastBotReply
         lastBotReply = 3
         botUpdate('You want to book a ticket to go from %s to %s on %s at %s.' % (org, dest, orgDepDate, orgDepTime))
-        botUpdate('Is this correct yes or no?')
+        if wantsRet:
+            botUpdate('And you want to return on %s at %s.' % (retDepDate, retDepTime))
+        botUpdate('Is this information correct yes or no?')
 
     @Rule(AS.f1 << Action('is-correct'),
           AS.f2 << information(isCorrect=False))
@@ -250,17 +329,13 @@ class trainBot(KnowledgeEngine):
         answer = uInput
         if answer == ('yes' or 'y' or 'Y'):
             self.modify(f2, isCorrect=True)
-            print('Ready to request actual data!')
+            # print('Ready to request actual data!')
             from nrailFareInfo import getFareInfo
-            global orig, dest, origDepDate, origDepTime
-            # Only works for single tickets so far
-            theURL = getFareInfo(orig, dest, origDepDate, origDepTime, False)
             from main import botUpdate
+            global orig, dest, origDepDate, origDepTime, wantsRet, retDepDate, retDepTime
+
+            theURL = getFareInfo(orig, dest, origDepDate, origDepTime, wantsRet, retDepDate, retDepTime)
             botUpdate(theURL)
-
-
-
-
 
     @Rule(AS.f1 << Action('determine-another-question'))
     def another_question(self, f1):

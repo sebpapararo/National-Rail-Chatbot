@@ -1,6 +1,7 @@
 #chatHistory {
-    width:700px;
-    height:400px;
+
+    width:1200px;
+    height:600px;
     overflow-y:auto;
 }
 body, h1, h2, h3, p, div, li, ul, form {

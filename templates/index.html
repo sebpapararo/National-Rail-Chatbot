@@ -19,11 +19,12 @@
                 <h4>{{item.whosaid}}</h4>{{item.item}}<br><br>
         {% endfor %}
     </div>
-
+    <div id="inputForm">
     <form action="/userUpdate" method="POST">
         <input name="inputBox" id="inputBox" placeholder="say to the bot... " autocomplete="off" autofocus>
         <input type="submit" value="Say it">
     </form>
+    </div>
 
     <br>
     <form action="/restartChat" method="POST">

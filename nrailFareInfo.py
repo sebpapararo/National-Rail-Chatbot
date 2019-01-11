@@ -6,10 +6,12 @@ from bs4 import BeautifulSoup
 # The dates and times will need to be formatted after being passed in
 
 
-def getFareInfo(origin, destination, originDepDate, originDepTime, wantsReturn):
+def getFareInfo(origin, destination, originDepDate, originDepTime, wantsReturn, returnDepDate, returnDepTime):
 
     originDepDate = originDepDate.replace('/', '')
     originDepTime = originDepTime.replace(':', '')
+    returnDepDate = returnDepDate.replace('/', '')
+    returnDepTime = returnDepTime.replace(':', '')
 
 # origin = 'Diss'
     origin = origin.replace(' ', '%20')
@@ -29,9 +31,8 @@ def getFareInfo(origin, destination, originDepDate, originDepTime, wantsReturn):
              + originDepDate + '/' + originDepTime + '/dep'
 
     # The ticket should be a return ticket
-    # if wantsReturn:
-    #     theURL += '/' + returnDepDate + '/' + returnDepTime + '/dep'
-
+    if wantsReturn:
+        theURL += '/' + returnDepDate + '/' + returnDepTime + '/dep'
 
     page = urlopen(theURL).read()
     soup = BeautifulSoup(page, 'html.parser')
@@ -73,8 +74,8 @@ def getFareInfo(origin, destination, originDepDate, originDepTime, wantsReturn):
 
         return theURL
 
-    # This is a return ticket. The cheapest option for a return ticket can be either a normal return ticket. Or two single
-    # tickets (one going each way)
+    # This is a return ticket. The cheapest option for a return ticket can be either a normal return ticket.
+    # Or two single tickets (one going each way)
     else:
         # table = soup.find('table', attrs={'id': 'oft'})
         cheapest = soup.findAll('td', attrs={'class': 'fare has-cheapest'})
@@ -84,111 +85,113 @@ def getFareInfo(origin, destination, originDepDate, originDepTime, wantsReturn):
             cheapestData = str(cheapest[0].find('script'))
 
             # Outbound ticket
-            print('######## Outward ########')
+            # print('######## Outward ########')
             departureStationName = cheapestData.split('departureStationName":"')[1].split('"')[0]
-            print("Departure Station: " + departureStationName)
+            # print("Departure Station: " + departureStationName)
             departureDateInfo = soup.find('h3', attrs={'class': 'outward top ctf-h3'})
             departureDayNo = departureDateInfo.findAll(text=True)[6]
             departureDay = departureDateInfo.findAll('abbr')[0].findAll(text=True)[0]
             departureMonth = departureDateInfo.findAll('abbr')[1].findAll(text=True)[0]
-            print("Departure Date: " + departureDay + departureDayNo + departureMonth)
+            # print("Departure Date: " + departureDay + departureDayNo + departureMonth)
             departureTime = cheapestData.split('departureTime":"')[1].split('"')[0]
-            print("Departure Time: " + departureTime)
+            # print("Departure Time: " + departureTime)
             arrivalStationName = cheapestData.split('arrivalStationName":"')[1].split('"')[0]
-            print("Arrival Station: " + arrivalStationName)
+            # print("Arrival Station: " + arrivalStationName)
             arrivalTime = cheapestData.split('arrivalTime":"')[1].split('"')[0]
-            print("Arrival Time: " + arrivalTime)
+            # print("Arrival Time: " + arrivalTime)
             durationHours = cheapestData.split('durationHours":')[1].split(',')[0]
             durationMinutes = cheapestData.split('durationMinutes":')[1].split(',')[0]
-            print("Duration: " + durationHours + "h " + durationMinutes + "m")
+            # print("Duration: " + durationHours + "h " + durationMinutes + "m")
             changes = cheapestData.split('changes":')[1].split(',')[0]
-            print("Changes: " + changes)
+            # print("Changes: " + changes)
 
             # Return ticket
             table = soup.find('table', attrs={'id': 'ift'})
             selectedRow = table.find('tr', attrs={'class': 'first mtx'})
             selectedReturn = str(selectedRow.find('script'))
 
-            print('######## Return ########')
+            # print('######## Return ########')
             departureStationName = selectedReturn.split('departureStationName":"')[1].split('"')[0]
-            print("Departure Station: " + departureStationName)
+            # print("Departure Station: " + departureStationName)
             departureDateInfo = soup.find('h3', attrs={'class': 'ctf-h3 return'})
             departureDayNo = departureDateInfo.findAll(text=True)[6]
             departureDay = departureDateInfo.findAll('abbr')[0].findAll(text=True)[0]
             departureMonth = departureDateInfo.findAll('abbr')[1].findAll(text=True)[0]
-            print("Departure Date: " + departureDay + departureDayNo + departureMonth)
+            # print("Departure Date: " + departureDay + departureDayNo + departureMonth)
             departureTime = selectedReturn.split('departureTime":"')[1].split('"')[0]
-            print("Departure Time: " + departureTime)
+            # print("Departure Time: " + departureTime)
             arrivalStationName = selectedReturn.split('arrivalStationName":"')[1].split('"')[0]
-            print("Arrival Station: " + arrivalStationName)
+            # print("Arrival Station: " + arrivalStationName)
             arrivalTime = selectedReturn.split('arrivalTime":"')[1].split('"')[0]
-            print("Arrival Time: " + arrivalTime)
+            # print("Arrival Time: " + arrivalTime)
             durationHours = selectedReturn.split('durationHours":')[1].split(',')[0]
             durationMinutes = selectedReturn.split('durationMinutes":')[1].split(',')[0]
-            print("Duration: " + durationHours + "h " + durationMinutes + "m")
+            # print("Duration: " + durationHours + "h " + durationMinutes + "m")
             changes = selectedReturn.split('changes":')[1].split(',')[0]
-            print("Changes: " + changes)
+            # print("Changes: " + changes)
 
-            print('')
+            # print('')
             rightSelected = soup.find('div', attrs={'id': 'fare-switcher'})
             ticketPrice = rightSelected.find('strong', attrs={'class': 'ctf-pr'}).findAll(text=True)[0]
-            print('Total Ticket Cost: ' + ticketPrice)
-            print('')
-            print('Click the following link to go and book this ticket: ')
-            print(theURL)
+            # print('Total Ticket Cost: ' + ticketPrice)
+            # print('')
+            # print('Click the following link to go and book this ticket: ')
+            # print(theURL)
+            return theURL
 
         # Means there is 2 cheapest tickets, and is therefore 2 singles there and back
         else:
             cheapestData = str(cheapest[0].find('script'))
 
             # Outbound ticket
-            print('######## Outward ########')
+            # print('######## Outward ########')
             departureStationName = cheapestData.split('departureStationName":"')[1].split('"')[0]
-            print("Departure Station: " + departureStationName)
+            # print("Departure Station: " + departureStationName)
             departureDateInfo = soup.find('h3', attrs={'class': 'outward top ctf-h3'})
             departureDayNo = departureDateInfo.findAll(text=True)[6]
             departureDay = departureDateInfo.findAll('abbr')[0].findAll(text=True)[0]
             departureMonth = departureDateInfo.findAll('abbr')[1].findAll(text=True)[0]
-            print("Departure Date: " + departureDay + departureDayNo + departureMonth)
+            # print("Departure Date: " + departureDay + departureDayNo + departureMonth)
             departureTime = cheapestData.split('departureTime":"')[1].split('"')[0]
-            print("Departure Time: " + departureTime)
+            # print("Departure Time: " + departureTime)
             arrivalStationName = cheapestData.split('arrivalStationName":"')[1].split('"')[0]
-            print("Arrival Station: " + arrivalStationName)
+            # print("Arrival Station: " + arrivalStationName)
             arrivalTime = cheapestData.split('arrivalTime":"')[1].split('"')[0]
-            print("Arrival Time: " + arrivalTime)
+            # print("Arrival Time: " + arrivalTime)
             durationHours = cheapestData.split('durationHours":')[1].split(',')[0]
             durationMinutes = cheapestData.split('durationMinutes":')[1].split(',')[0]
-            print("Duration: " + durationHours + "h " + durationMinutes + "m")
+            # print("Duration: " + durationHours + "h " + durationMinutes + "m")
             changes = cheapestData.split('changes":')[1].split(',')[0]
-            print("Changes: " + changes)
+            # print("Changes: " + changes)
 
             cheapestData = str(cheapest[1].find('script'))
 
             # Return ticket
-            print('######## Return ########')
+            # print('######## Return ########')
             departureStationName = cheapestData.split('departureStationName":"')[1].split('"')[0]
-            print("Departure Station: " + departureStationName)
+            # print("Departure Station: " + departureStationName)
             departureDateInfo = soup.find('h3', attrs={'class': 'ctf-h3 return'})
             departureDayNo = departureDateInfo.findAll(text=True)[6]
             departureDay = departureDateInfo.findAll('abbr')[0].findAll(text=True)[0]
             departureMonth = departureDateInfo.findAll('abbr')[1].findAll(text=True)[0]
-            print("Departure Date: " + departureDay + departureDayNo + departureMonth)
+            # print("Departure Date: " + departureDay + departureDayNo + departureMonth)
             departureTime = cheapestData.split('departureTime":"')[1].split('"')[0]
-            print("Departure Time: " + departureTime)
+            # print("Departure Time: " + departureTime)
             arrivalStationName = cheapestData.split('arrivalStationName":"')[1].split('"')[0]
-            print("Arrival Station: " + arrivalStationName)
+            # print("Arrival Station: " + arrivalStationName)
             arrivalTime = cheapestData.split('arrivalTime":"')[1].split('"')[0]
-            print("Arrival Time: " + arrivalTime)
+            # print("Arrival Time: " + arrivalTime)
             durationHours = cheapestData.split('durationHours":')[1].split(',')[0]
             durationMinutes = cheapestData.split('durationMinutes":')[1].split(',')[0]
-            print("Duration: " + durationHours + "h " + durationMinutes + "m")
+            # print("Duration: " + durationHours + "h " + durationMinutes + "m")
             changes = cheapestData.split('changes":')[1].split(',')[0]
-            print("Changes: " + changes)
+            # print("Changes: " + changes)
 
-            print('')
+            # print('')
             rightSelected = soup.find('a', attrs={'id': 'singleFaresPane'})
             ticketPrice = rightSelected.find('strong', attrs={'class': 'ctf-pr'}).findAll(text=True)[0]
-            print('Total Ticket Cost: ' + ticketPrice)
-            print('')
-            print('Click the following link to go and book this ticket: ')
-            print(theURL)
+            # print('Total Ticket Cost: ' + ticketPrice)
+            # print('')
+            # print('Click the following link to go and book this ticket: ')
+            # print(theURL)
+            return theURL
