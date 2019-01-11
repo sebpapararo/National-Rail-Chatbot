@@ -2,7 +2,7 @@ from pyknow import *
 from nlp_testGround import *
 
 # Global Variables
-lastBotReply = ''
+lastBotReply = 0
 uInput = ''
 orig = ''
 dest = ''
@@ -26,28 +26,23 @@ class information(Fact):
 class Action(Fact):
     pass
 
-
-class userAnswer(Fact):
-    pass
-
-
-class ComputerQuestion(Fact):
-    pass
-
-
 class trainBot(KnowledgeEngine):
 
     def passReply(userInput, self):
-        global uInput, orig, dest
+        global uInput
         uInput = userInput
-        if lastBotReply == 'Hello, how may I help you today?':
-            self.declare(Action('get-human-answer'))
-        elif lastBotReply == 'Where are you departing from?':
-            self.declare(Action('receive-origin'))
-        elif lastBotReply == 'Where would you like to go?':
-            self.declare(Action('receive-destination'))
-        elif lastBotReply == 'You want to book a ticket to go from %s to %s is this correct yes or no?' % (orig, dest):
-            self.declare(Action('is-correct'))
+        def switch_demo(lastbotreply):
+            switcher = {
+                0: 'get-human-answer',
+                1: 'receive-origin',
+                2: 'receive-destination',
+                3: 'is-correct'
+            }
+            return switcher.get(lastBotReply)
+
+        global lastBotReply
+        self.declare(Action(switch_demo(lastBotReply)))
+
 
     def yes_or_no(self, question):
         return input(question).upper().startswith('Y')
@@ -60,8 +55,8 @@ class trainBot(KnowledgeEngine):
     def startup(self):
         from main import botUpdate
         global lastBotReply
-        lastBotReply = 'Hello, how may I help you today?'
-        botUpdate(lastBotReply)
+        lastBotReply = 0
+        botUpdate('Hello, how may I help you today?')
         # botUpdate('e.g. Can I book a train ticket, Get trains times for...')
 
     # Do they want to book a ticket
@@ -72,7 +67,7 @@ class trainBot(KnowledgeEngine):
         # print("Would you like to book a ticket?")
         question = uInput
         res = tuple(Custom_pos_tag(word_tokenize(question)))
-        self.declare(userAnswer(res))
+
         if ('book', 'VB') in res:
             print("Booking = True")
             self.modify(f2, booking = True)
@@ -90,8 +85,8 @@ class trainBot(KnowledgeEngine):
         self.retract(f1)
         from main import botUpdate
         global lastBotReply
-        lastBotReply = 'Where are you departing from?'
-        botUpdate(lastBotReply)
+        lastBotReply = 1
+        botUpdate('Where are you departing from?')
 
     # Receives the origin
     @Rule(AS.f1 << Action('receive-origin'),
@@ -110,8 +105,8 @@ class trainBot(KnowledgeEngine):
         self.retract(f1)
         from main import botUpdate
         global lastBotReply
-        lastBotReply = 'Where would you like to go?'
-        botUpdate(lastBotReply)
+        lastBotReply = 2
+        botUpdate('Where would you like to go?')
 
     # Receives the destination
     @Rule(AS.f1 << Action('receive-destination'),
@@ -153,8 +148,8 @@ class trainBot(KnowledgeEngine):
         self.retract(f1)
         from main import botUpdate
         global lastBotReply
-        lastBotReply = 'You want to book a ticket to go from %s to %s is this correct yes or no?' % (org, dest)
-        botUpdate(lastBotReply)
+        lastBotReply = 3
+        botUpdate('You want to book a ticket to go from %s to %s is this correct yes or no?' % (org, dest))
 
     @Rule(AS.f1 << Action('is-correct'),
           AS.f2 << information(isCorrect=False))
