@@ -36,7 +36,7 @@ class trainBot(KnowledgeEngine):
 
     def passReply(userInput, engine):
         global uInput
-        uInput = userInput
+        uInput = userInput.lower()
         def switch_demo(lastbotreply):
             switcher = {
                 0: 'get-human-answer',
@@ -87,6 +87,9 @@ class trainBot(KnowledgeEngine):
             origi = ''
             origiDepDate = ''
             origiDepTime = ''
+            wanRet = False
+            retiDepDate = ''
+            retiDepTime = ''
             # loc = findStations(res)
             loc = findINandTO(res)
             print(loc)
@@ -118,12 +121,28 @@ class trainBot(KnowledgeEngine):
                 origDepTime = timeInFirstMessage(res)
                 origiDepTime = timeInFirstMessage(res)
 
+            if wantsReturn(res):
+                global wantsRet
+                wantsRet = wantsReturn(res)
+                wanRet = wantsReturn(res)
+
+            if retDateInFirstMessage(res):
+                global retDepDate
+                retDepDate = retDateInFirstMessage(res)
+                retiDepDate = retDateInFirstMessage(res)
+
+            if retTimeInFirstMessage(res):
+                global retDepTime
+                retDepTime = retTimeInFirstMessage(res)
+                retiDepTime = retTimeInFirstMessage(res)
+
             self.modify(f2, booking=True, destination=destin, origin=origi, originDepDate=origiDepDate,
-                        originDepTime=origiDepTime)
+                        originDepTime=origiDepTime, wantsReturn=wanRet, returnDepDate=retiDepDate,
+                        returnDepTime=retiDepTime)
             self.declare(Action('get-human-answer'))
         else:
             from main import botUpdate
-            botUpdate("Sorry I didn't what you said. Cloud you please try again?")
+            botUpdate("Sorry I didn't understand what you said. Cloud you please try again?")
 
 
     # Asks the origin

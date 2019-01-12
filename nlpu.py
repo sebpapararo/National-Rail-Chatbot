@@ -155,13 +155,45 @@ def removeWantsTicketPart(input):
 def dateInFirstMessage(input):
     input = untag(input)
     rex = re.compile("^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{2}$")
-    for item in input:
-        if rex.match(item):
-            return item
+    if 'return' in input:
+        for item in input[:input.index('return')]:
+            if rex.match(item):
+                return item
+    else:
+        for item in input:
+            if rex.match(item):
+                return item
 
 def timeInFirstMessage(input):
     input = untag(input)
     rex = re.compile("^[0-2][0-9][:][0-5][0-9]$")
-    for item in input:
-        if rex.match(item):
-            return item
+    if 'return' in input:
+        for item in input[:input.index('return')]:
+            if rex.match(item):
+                return item
+    else:
+        for item in input:
+            if rex.match(item):
+                return item
+
+def wantsReturn(input):
+    input = untag(input)
+    if 'return' in input:
+        return True
+    return False
+
+def retDateInFirstMessage(input):
+    input = untag(input)
+    rex = re.compile("^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{2}$")
+    if 'return' in input:
+        for item in input[input.index('return'):]:
+            if rex.match(item):
+                return item
+
+def retTimeInFirstMessage(input):
+    input = untag(input)
+    rex = re.compile("^[0-2][0-9][:][0-5][0-9]$")
+    if 'return' in input:
+        for item in input[input.index('return'):]:
+            if rex.match(item):
+                return item
