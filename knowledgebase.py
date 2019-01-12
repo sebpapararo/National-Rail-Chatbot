@@ -70,6 +70,7 @@ class trainBot(KnowledgeEngine):
         lastBotReply = 0
         botUpdate('Hello, how may I help you today?')
         botUpdate('e.g. Can I book a train ticket, Get trains times for...')
+        botUpdate('Please enter dates in the format: dd/mm/yy, and times in the 24hr format: hh:mm')
 
     # Do they want to book a ticket
     @Rule(AS.f1 << Action('get-human-answer'),
@@ -84,6 +85,8 @@ class trainBot(KnowledgeEngine):
             print(res)
             destin = ''
             origi = ''
+            origiDepDate = ''
+            origiDepTime = ''
             # loc = findStations(res)
             loc = findINandTO(res)
             print(loc)
@@ -104,7 +107,19 @@ class trainBot(KnowledgeEngine):
                     if len(loc) > 2:
                         origi = loc[3][0]
                         print("test2 origin = " + origi)
-            self.modify(f2, booking=True, destination=destin, origin=origi)
+
+            if dateInFirstMessage(res):
+                global origDepDate
+                origDepDate = dateInFirstMessage(res)
+                origiDepDate = dateInFirstMessage(res)
+
+            if timeInFirstMessage(res):
+                global origDepTime
+                origDepTime = timeInFirstMessage(res)
+                origiDepTime = timeInFirstMessage(res)
+
+            self.modify(f2, booking=True, destination=destin, origin=origi, originDepDate=origiDepDate,
+                        originDepTime=origiDepTime)
             self.declare(Action('get-human-answer'))
         else:
             from main import botUpdate

@@ -30,15 +30,15 @@
                     <div id="botText">
                     {% if item.item.startswith("http") %}
                         <p>Ticket found! </p>
-                        <a href="{{item.item}}">Click here to see the ticket!</a>
+                        <a href="{{item.item}}" target="_blank">Click here to see the ticket!</a>
                     {% else %}
                             {{item.item}}
                     {% endif %}
                     </div>
                     <h4>{{item.whosaid}}</h4>
-                        <br><br>
                 </div>
             {% endif %}
+            <br>
 
         {% endfor %}
     </div>
