@@ -94,22 +94,19 @@ class trainBot(KnowledgeEngine):
             loc = findINandTO(res)
             print(loc)
             if loc:
+                global dest, orig
                 if loc[0][1] == 'IN':
                     origi = loc[1][0]
-                    global orig
                     orig = origi
-                    print("Test origin = " + origi)
                     if len(loc) > 2:
                         destin = loc[3][0]
-                        global dest
                         dest = destin
-                        print("test2 destination = " + destin)
                 elif loc[0][1] == 'TO':
                     destin = loc[1][0]
-                    print("Test destination = " + destin)
+                    dest = destin
                     if len(loc) > 2:
                         origi = loc[3][0]
-                        print("test2 origin = " + origi)
+                        orig = origi
 
             if dateInFirstMessage(res):
                 global origDepDate
@@ -398,7 +395,7 @@ class trainBot(KnowledgeEngine):
         from main import botUpdate
         global lastBotReply
         lastBotReply = 3
-        botUpdate('You want to book a ticket to go from %s to %s on %s at %s.' % (org, dest, orgDepDate, orgDepTime))
+        botUpdate('You want to book a ticket to go from %s to %s on %s at %s.' % (org.title(), dest.title(), orgDepDate, orgDepTime))
         if wantsRet:
             botUpdate('And you want to return on %s at %s.' % (retDepDate, retDepTime))
         botUpdate('Is this information correct yes or no?')

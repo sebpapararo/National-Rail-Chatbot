@@ -1,7 +1,6 @@
-import re
-
 import nltk
-
+from nltk import word_tokenize
+import re
 #This is tagging from a guide
 
 #https://nlpforhackers.io/training-pos-tagger/
@@ -98,8 +97,9 @@ def findINandTO(sentence):
     found = []
     for index, w in enumerate(sentence):
         if(w[1] == 'IN') or (w[1] == 'TO'):
-            found.append(sentence[index])
-            found.append(sentence[index+1])
+            if isRealStation(sentence[index+1][0]):
+                found.append(sentence[index])
+                found.append(sentence[index+1])
     return found
 
 def isRealStation(station):
@@ -135,8 +135,11 @@ def isDateFormat(date):
         return False
 
 def wantsTicket(input):
-    # key = tuple('book', 'VB'),tuple('ticket', 'NN')
-    if ('book', 'VB') in input:
+    key = (('book','VB'),('ticket', 'NN'),('ticket', 'NNP'))
+    for k in key:
+        if k in input:
+            return True
+    if len(findStations(input)) > 0:
         return True
     return False
 
