@@ -1,6 +1,7 @@
-import nltk
-from nltk import word_tokenize
 import re
+
+import nltk
+
 #This is tagging from a guide
 
 #https://nlpforhackers.io/training-pos-tagger/
@@ -202,4 +203,4 @@ def retTimeInFirstMessage(input):
                 return item
 
 def wantsTime(input):
-    return True
+    return False

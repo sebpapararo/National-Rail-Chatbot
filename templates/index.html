@@ -14,10 +14,38 @@
     <div id="chatHistory">
 
 
-        <ul id="chatCon">
+        {% for item in data %}
+
+            {% if item.whosaid == "You: "%}
+                <div id="youSaid">
+                    <h4>{{item.whosaid}}</h4>
+                    <div id="youText">
+                        {{item.item}}
+                    </div>
+                </div>
+            {% else %}
+                <div id="botSaid">
+                    <div id="botText">
+                    {% if item.item.startswith("http") %}
+                        <p>Ticket found! </p>
+                        <a href="{{item.item}}" target="_blank">Click here to see the ticket!</a>
+                    {% else %}
+                            {{item.item}}
+                    {% endif %}
+                    </div>
+                    <h4>{{item.whosaid}}</h4>
+                </div>
+            {% endif %}
+            <br>
+        {% endfor %}
 
 
-        </ul>
+
+        <!--<ul id="chatCon">-->
+
+
+
+        <!--</ul>-->
     </div>
 
 
