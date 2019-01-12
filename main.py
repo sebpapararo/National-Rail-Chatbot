@@ -75,7 +75,7 @@ def userUpdate():
 
 @app.route('/botUpdate', methods=['GET', 'POST'])
 def botUpdate(botReply):
-    query = 'INSERT INTO chatHist (whosaid, item) VALUES("Bot: ", "%s");' % botReply
+    query = 'INSERT INTO chatHist (whosaid, item) VALUES(" :Bot", "%s");' % botReply
     query_db(query)
     get_db().commit()
 

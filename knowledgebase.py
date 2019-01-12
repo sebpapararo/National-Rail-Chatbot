@@ -82,15 +82,19 @@ class trainBot(KnowledgeEngine):
         if wantsTicket(res):
             destin = ''
             origi = ''
-            loc = []
+            # loc = []
             loc = findStations(res)
             if loc:
                 if loc[0][1] == 'IN':
                     origi = loc[1][0]
+                    global orig
+                    orig = origi
                     print("Test origin = " + origi)
                     # self.modify(f2, origin=input)
                     if len(loc) > 2:
                         destin = loc[3][0]
+                        global dest
+                        dest = destin
                         print("test2 destination = " + destin)
                         # self.modify(f2, destination=input)
                 elif loc[0][1] == 'TO':

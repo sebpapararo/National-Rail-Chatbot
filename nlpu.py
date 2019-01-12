@@ -1,6 +1,7 @@
-import nltk
-from nltk import word_tokenize
 import re
+
+import nltk
+
 #This is tagging from a guide
 
 #https://nlpforhackers.io/training-pos-tagger/
@@ -126,7 +127,7 @@ def isDateFormat(date):
         return False
 
 def wantsTicket(input):
-    if ('book', 'VB') or ('ticket', 'NN') in input:
+    if ('book', 'VB') in input:
         return True
     return False
 

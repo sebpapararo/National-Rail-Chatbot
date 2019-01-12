@@ -37,6 +37,7 @@ def getFareInfo(origin, destination, originDepDate, originDepTime, wantsReturn, 
     page = urlopen(theURL).read()
     soup = BeautifulSoup(page, 'html.parser')
 
+    # print(theURL)
 
     # Ticket is a single
     if not wantsReturn:

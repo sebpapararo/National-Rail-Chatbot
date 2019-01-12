@@ -1,11 +1,30 @@
 #chatHistory {
-
-    width:1200px;
+    width:600px;
     height:600px;
     overflow-y:auto;
+    overflow-x:auto;
 }
+
+#botSaid {
+    text-align: right;
+}
+
+#botText {
+    display: inline-block;
+    background-color: lightgray;
+}
+
+#youText {
+    display: inline-block;
+    background-color: lightblue;
+}
+
 body, h1, h2, h3, p, div, li, ul, form {
     margin: 0; padding: 0; line-height: 1em; border: 0;
+}
+
+p {
+    display: inline-block;
 }
 
 body {
