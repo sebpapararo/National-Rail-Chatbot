@@ -1,33 +1,123 @@
-#chatHistory {
-    width:700px;
-    height:600px;
-    overflow-y:auto;
-    overflow-x:auto;
+
+#start{
+	width: 700px;
+	height: 600px;
+	overflow: hidden;
+	text-align: center;
+	position: relative;
+	margin: 20px auto;
+	border-radius: 5px;
+}
+#start>h1{
+	width: inherit;
+	background: #000;
+	color: #FFFFFF;
+	padding: 20px 0px;
 }
 
-#botSaid {
-    text-align: right;
+#chatHistory{
+	position: absolute;
+	padding: 20px;
+    width:658px;
+    height:400px; 
+	border: 1px solid;
+	/* overflow: hidden; */
+	overflow-y:auto;
+}
+#chatHistory>ul{
+	overflow: hidden;
+}
+#chatCon>li:nth-child(even){
+	color: red;
+	text-align: right;
+}
+#chatCon>li:nth-child(even)>b{
+	float: right;
+}
+#chatCon>li:nth-child(even)>span{
+	float: right;
+	margin: 0px 10px 0px 0px;
+	background: green;
+	padding: 5px 20px 5px 10px;
+	text-align: left;
+}
+#chatCon>li{
+	overflow: hidden;
+	position: relative;
+}
+#chatCon>li>b{
+	float: left;
+	width: 40px;
+	height: 40px;
+}
+#chatCon>li>b>img{
+	width: inherit;
+}
+#chatCon>li>span{
+	margin-left: 10px;
+	line-height: 20px;
+	float: left;
+	width: 150px;
+	border-radius: 5px;
+	background: #02596B;
+	padding: 5px 20px 5px 10px;
+	color: #fff;
+	word-wrap: break-word;
+	text-align: left;
+}
+#box{
+	width: inherit;
+	position: absolute;
+	bottom: 0px;
+	text-align: center;
+	margin: 0px 0px;
+}
+form {
+ float: left;
 }
 
-#botText {
-    display: inline-block;
-    background-color: lightgray;
+#inputBox{
+	text-align: center;
+	width: 300px;
+	padding: 10px;
+	border: 1px solid #666;
+	outline: none;
+	border-radius: 5px;
+}
+#inputBtn {
+	outline: none;
+	border-radius: 5px;
+	border: none;
+	display: inline-block;
+	background: #555;
+	color: #FFFFFF;
+	cursor: pointer;
+	width: 90px;
+	padding:10px;
+	margin-right: 10px;
 }
 
-#youText {
-    display: inline-block;
-    background-color: lightblue;
+#resetBtn {
+	outline: none;
+	display: inline-block;
+	border-radius: 5px;
+	border: none;
+	background: #555;
+	color: #FFFFFF;
+	cursor: pointer;
+	width: 90px;
+	padding:10px;
 }
 
+#inputBtn:hover{
+	background: #222;
+}	
 body, h1, h2, h3, p, div, li, ul, form {
     margin: 0; padding: 0; line-height: 1em; border: 0;
+	list-style: none;
 }
 
-p {
-    display: inline-block;
-}
-
-body {
+/* body {
     line-height: 1.5em;
     font-family: sans-serif;
     width: 50em;
@@ -43,10 +133,6 @@ h1 {
 h2 {
     padding-top: 0.5em;
     padding-bottom: 0.5em;
-}
-
-h4 {
-    display: inline;
 }
 
 ul.content > li {
@@ -92,4 +178,4 @@ nav a {
 
 nav form {
     display: inline;
-}
+} */

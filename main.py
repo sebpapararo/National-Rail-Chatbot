@@ -52,7 +52,7 @@ def index():
     query = "SELECT itemid, whosaid, item FROM chatHist"
     result = query_db(query)
 
-    return render_template('index.html', data=result)
+    return render_template('old_index.html', data=result)
 
 
 @app.route('/userUpdate', methods=['GET', 'POST'])
@@ -82,7 +82,7 @@ def botUpdate(botReply):
     query = "SELECT itemid, item FROM chatHist"
     result = query_db(query)
 
-    return render_template('index.html', data=result)
+    return render_template('old_index.html', data=result)
 
 
 @app.route('/restartChat', methods=['GET', 'POST'])
