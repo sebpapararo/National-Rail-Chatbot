@@ -109,22 +109,28 @@ print(location)
 # print("The probability that is it going to be early: " + str(probsEarl))
 # print("The probability that is it going to be on time: " + str(probsOntim))
 
-from sklearn.naive_bayes import GaussianNB
-import numpy as np
+# x= np.array()
+# y = np.array()
 
+from datetime import datetime
+for i in range(0, len(scheduledArrivalTime), 2):
 
-x= np.array([[2,4],[1,2], [1,2], [-2,-4], [2,4], [-4,-8], [-1,-2], [1,2], [-2,-4], [2,4], [-4,1], [-2,7]])
-y = np.array([3, 3, 3, 3, 4, 3, 3, 4, 3, 4, 4, 4])
+  if actualDepartureTime[i] != '':
+    FMT = '%H%M'
+    tdelta = datetime.strptime(actualDepartureTime[i], FMT) - datetime.strptime(scheduledDepartureTime[i], FMT)
+
+    depDelay = int(actualDepartureTime[i]) - int(scheduledDepartureTime[i])
+    print(tdelta)
 
 
 #Create a Gaussian Classifier
-model = GaussianNB()
-
-# Train the model using the training sets
-model.fit(x, y)
-
-#Predict Output
-predicted= model.predict([[1,2]])
-print(predicted)
+# model = GaussianNB()
+#
+# # Train the model using the training sets
+# model.fit(x, y)
+#
+# #Predict Output
+# predicted= model.predict([[3]])
+# print(predicted)
 
 
