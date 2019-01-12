@@ -80,42 +80,36 @@ class trainBot(KnowledgeEngine):
         res = tuple(Custom_pos_tag(word_tokenize(question)))
         print(res)
         if wantsTicket(res):
+            res = removeWantsTicketPart(res)
+            print(res)
             destin = ''
             origi = ''
-            # loc = []
-            loc = findStations(res)
+            # loc = findStations(res)
+            loc = findINandTO(res)
+            print(loc)
             if loc:
                 if loc[0][1] == 'IN':
                     origi = loc[1][0]
                     global orig
                     orig = origi
                     print("Test origin = " + origi)
-                    # self.modify(f2, origin=input)
                     if len(loc) > 2:
                         destin = loc[3][0]
                         global dest
                         dest = destin
                         print("test2 destination = " + destin)
-                        # self.modify(f2, destination=input)
                 elif loc[0][1] == 'TO':
                     destin = loc[1][0]
                     print("Test destination = " + destin)
-                    # self.modify(f2, destination=input)
                     if len(loc) > 2:
                         origi = loc[3][0]
                         print("test2 origin = " + origi)
-                        # self.modify(f2, origin=input)
             self.modify(f2, booking=True, destination=destin, origin=origi)
             self.declare(Action('get-human-answer'))
         else:
-            self.declare(Action('unknown-input'))
+            from main import botUpdate
+            botUpdate("Sorry I didn't what you said. Cloud you please try again?")
 
-        # if ('book', 'VB') or ('ticket', 'NN') in res:
-        #     print("Booking = True")
-        #     self.modify(f2, booking=True)
-        #     self.declare(Action('get-human-answer'))
-        # else:
-        #     self.declare(Action('unknown-input'))
 
     # Asks the origin
     @Rule(AS.f1 << Action('get-human-answer'),
