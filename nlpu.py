@@ -202,4 +202,4 @@ def retTimeInFirstMessage(input):
                 return item
 
 def wantsTime(input):
-    return True
+    return False
