@@ -1,6 +1,7 @@
 import re
 
 import nltk
+from nltk import word_tokenize
 
 #This is tagging from a guide
 

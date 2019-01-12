@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>Group 17 Chatbot</title>
-    <link rel="stylesheet" type="text/css" href="../static/main.css">
-
+    <link rel="stylesheet" type="text/css" href="static/main.css">
 </head>
+
 <body>
-<div id="start">
-    <h1>Group 17 - Train Booking Chatbot</h1>
+
+<h1>Group 17 - Train Booking Chatbot</h1>
+
+<div id="conversation">
 
 
     <div id="chatHistory">
-
 
         {% for item in data %}
 
@@ -38,39 +39,26 @@
             {% endif %}
             <br>
         {% endfor %}
-
-
-
-        <!--<ul id="chatCon">-->
-
-
-
-        <!--</ul>-->
-    </div>
-
-
-    <div id="box">
-        <form action="/userUpdate" method="POST">
-            <input name="inputBox" id="inputBox" placeholder="say to the bot... " autocomplete="off" autofocus>
-            <input type="submit" value="Say it" id="inputBtn">
-        </form>
-        <form action="/restartChat" method="POST">
-            <input type="submit" value="Restart Chat" id="resetBtn">
-        </form>
     </div>
 
     <script>
         var element = document.getElementById("chatHistory");
         element.scrollTop = element.scrollHeight;
-
     </script>
-    <br>
 
+    <div id="inputForm">
+    <form action="/userUpdate" method="POST">
+        <input name="inputBox" id="inputBox" placeholder="say to the bot... " autocomplete="off" autofocus>
+        <input type="submit" value="Say it">
+    </form>
+    </div>
+
+    <br>
+    <form action="/restartChat" method="POST">
+        <input type="submit" value="Restart Chat">
+    </form>
 
 </div>
 
-
 </body>
-<!--<script type="text/javascript" src="../static/main.js"></script>-->
-
 </html>

@@ -1,6 +1,8 @@
 import json
 
 import requests
+from sklearn.naive_bayes import GaussianNB
+import numpy as np
 
 # Documentation can be found at
 #   https://wiki.openraildata.com/index.php/HSP
@@ -109,8 +111,8 @@ print(location)
 # print("The probability that is it going to be early: " + str(probsEarl))
 # print("The probability that is it going to be on time: " + str(probsOntim))
 
-# x= np.array()
-# y = np.array()
+x = np.array()
+y = np.array()
 
 from datetime import datetime
 for i in range(0, len(scheduledArrivalTime), 2):
