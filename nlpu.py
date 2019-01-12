@@ -1,6 +1,8 @@
+import re
+
 import nltk
 from nltk import word_tokenize
-import re
+
 #This is tagging from a guide
 
 #https://nlpforhackers.io/training-pos-tagger/

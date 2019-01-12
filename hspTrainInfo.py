@@ -1,6 +1,8 @@
 import json
 
 import requests
+from sklearn.naive_bayes import GaussianNB
+import numpy as np
 
 # Documentation can be found at
 #   https://wiki.openraildata.com/index.php/HSP
@@ -24,20 +26,22 @@ userTrainRID = '123456789'
 # in Minutes
 delayedBy = '5'
 
+
+
 api_url = "https://hsp-prod.rockshore.net/api/v1/serviceMetrics"
 # api_url = "https://hsp-prod.rockshore.net/api/v1/serviceDetails"
 
-headers = {"Content-Type": "application/json"}
-auths = ("n.lilly@uea.ac.uk", "Qwerty123_")
+headers = { "Content-Type": "application/json" }
+auths = ("n.lilly@uea.ac.uk","Qwerty123_")
 
 data = {
-    "from_loc": currentLocation,
-    "to_loc": destination,
-    "from_time": "0900",
-    "to_time": "1100",
-    "from_date": "2018-12-23",
-    "to_date": "2019-01-11",
-    "days": "WEEKDAY"
+  "from_loc": currentLocation,
+  "to_loc": destination,
+  "from_time": "0900",
+  "to_time": "1100",
+  "from_date": "2018-12-23",
+  "to_date": "2019-01-11",
+  "days": "WEEKDAY"
 }
 
 r = requests.post(api_url, headers=headers, auth=auths, json=data)
@@ -50,9 +54,9 @@ parsedInfo = json.loads(r.text)
 allMatchingRIDS = []
 
 for service in parsedInfo['Services']:
-    # print(service.get('serviceAttributesMetrics').get('rids'))
-    for matchedTrains in service.get('serviceAttributesMetrics').get('rids'):
-        allMatchingRIDS.append(matchedTrains)
+  # print(service.get('serviceAttributesMetrics').get('rids'))
+  for matchedTrains in service.get('serviceAttributesMetrics').get('rids'):
+    allMatchingRIDS.append(matchedTrains)
 
 # print(allMatchingRIDS)
 
@@ -65,19 +69,19 @@ actualDepartureTime = []
 location = []
 
 for RID in allMatchingRIDS:
-    data = {
-        "rid": RID
-    }
-    r = requests.post(api_url, headers=headers, auth=auths, json=data)
-    parsedInfo = json.loads(r.text)
+  data = {
+    "rid": RID
+  }
+  r = requests.post(api_url, headers=headers, auth=auths, json=data)
+  parsedInfo = json.loads(r.text)
 
-    for loc in parsedInfo.get('serviceAttributesDetails').get('locations'):
-        if (loc.get('location') == currentLocation) or (loc.get('location') == destination):
-            scheduledArrivalTime.append(loc.get('gbtt_pta'))
-            scheduledDepartureTime.append(loc.get('gbtt_ptd'))
-            actualArrivalTime.append(loc.get('actual_ta'))
-            actualDepartureTime.append(loc.get('actual_td'))
-            location.append(loc.get('location'))
+  for loc in parsedInfo.get('serviceAttributesDetails').get('locations'):
+    if (loc.get('location') == currentLocation) or (loc.get('location') == destination):
+      scheduledArrivalTime.append(loc.get('gbtt_pta'))
+      scheduledDepartureTime.append(loc.get('gbtt_ptd'))
+      actualArrivalTime.append(loc.get('actual_ta'))
+      actualDepartureTime.append(loc.get('actual_td'))
+      location.append(loc.get('location'))
 
 print(scheduledArrivalTime)
 print(actualArrivalTime)
@@ -127,7 +131,3 @@ print(x)
 # predicted= model.predict([[3]])
 # print(predicted)
 
-
-import sklearn
-
-trainingData = []
