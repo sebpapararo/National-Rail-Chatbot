@@ -200,3 +200,6 @@ def retTimeInFirstMessage(input):
         for item in input[input.index('return'):]:
             if rex.match(item):
                 return item
+
+def wantsTime(input):
+    return True

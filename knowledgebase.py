@@ -137,6 +137,9 @@ class trainBot(KnowledgeEngine):
                         originDepTime=origiDepTime, wantsReturn=wanRet, returnDepDate=retiDepDate,
                         returnDepTime=retiDepTime)
             self.declare(Action('get-human-answer'))
+        elif wantsTime(res):
+            print("They want to get arrival time")
+
         else:
             from main import botUpdate
             botUpdate("Sorry I didn't understand what you said. Cloud you please try again?")
@@ -415,18 +418,35 @@ class trainBot(KnowledgeEngine):
             theURL = getFareInfo(orig, dest, origDepDate, origDepTime, wantsRet, retDepDate, retDepTime)
             botUpdate(theURL)
 
-    @Rule(AS.f1 << Action('determine-another-question'))
-    def another_question(self, f1):
-        self.retract(f1)
-        if not self.yes_or_no("Do you have another question?"):
-            print("Thanks for using me, and I hope everything worked sufficiently")
-        else:
-            print("How may i help you today?")
-            self.declare(Action('get-human-answer'))
+    # @Rule(AS.f1 << Action('determine-another-question'))
+    # def another_question(self, f1):
+    #     self.retract(f1)
+    #     if not self.yes_or_no("Do you have another question?"):
+    #         print("Thanks for using me, and I hope everything worked sufficiently")
+    #     else:
+    #         print("How may i help you today?")
+    #         self.declare(Action('get-human-answer'))
+    #
+    # @Rule(AS.f1 << Action('unknown-input'))
+    # def unknown_input(self, f1):
+    #     self.retract(f1)
+    #     from main import botUpdate
+    #     botUpdate("I'm sorry, I didn't understand that. Please try again.")
+    #     # print("I'm sorry, I didn't understand that. Please try again.")
 
-    @Rule(AS.f1 << Action('unknown-input'))
-    def unknown_input(self, f1):
-        self.retract(f1)
-        from main import botUpdate
-        botUpdate("I'm sorry, I didn't understand that. Please try again.")
-        # print("I'm sorry, I didn't understand that. Please try again.")
+################################################################################
+##########################  Section 2  #########################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
