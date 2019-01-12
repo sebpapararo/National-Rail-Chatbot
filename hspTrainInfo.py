@@ -23,8 +23,8 @@ import numpy as np
 currentLocation = 'NRW'
 destination = 'IPS'
 userTrainRID = '123456789'
-# in Minutes
-delayedBy = '5'
+# in Minutes needs to be converted to int here
+delayedBy = 1
 
 
 
@@ -129,10 +129,6 @@ else:
     tdelta = int(tdelta)
     y = np.array(tdelta)
 
-
-
-
-
 for i in range(2, len(scheduledDepartureTime), 2):
 
     if (actualDepartureTime[i] != '') and (actualArrivalTime[i+1] != '') \
@@ -151,7 +147,7 @@ for i in range(2, len(scheduledDepartureTime), 2):
             tdelta = '-' + tdelta
             tdelta = int(tdelta)
             tdelta = [tdelta]
-            x1 = np.append(x, [tdelta], axis=0)
+            x = np.append(x, [tdelta], axis=0)
 
         arrDelay = int(actualArrivalTime[i+1]) - int(scheduledArrivalTime[i+1])
         FMT = '%H%M'
@@ -167,8 +163,8 @@ for i in range(2, len(scheduledDepartureTime), 2):
             tdelta = int(tdelta)
             y = np.append(y, tdelta)
 
-print(x)
-print(y)
+# print(x)
+# print(y)
 
 # Create a Gaussian Classifier
 model = GaussianNB()
@@ -176,7 +172,7 @@ model = GaussianNB()
 # Train the model using the training sets
 model.fit(x, y)
 
-#Predict Output
-predicted= model.predict([[3]])
-print('Predicted delay in minutes: ' + predicted)
+# Predict Output
+predicted = model.predict([[delayedBy]])
+print('Predicted delay in minutes: ' + str(predicted))
 
