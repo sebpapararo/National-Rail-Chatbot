@@ -89,17 +89,54 @@ print(scheduledDepartureTime)
 print(actualDepartureTime)
 print(location)
 
+print(len(scheduledArrivalTime))
+print(len(scheduledDepartureTime))
+
+
 import numpy as np
 from sklearn.naive_bayes import GaussianNB
 
-x = np.array([])
-y = np.array([])
 
 from datetime import datetime
 
-for i in range(0, len(scheduledArrivalTime), 2):
+depDelay = int(actualDepartureTime[0]) - int(scheduledDepartureTime[0])
+FMT = '%H%M'
+if depDelay >= 0:
+    tdelta = datetime.strptime(actualDepartureTime[0], FMT) - datetime.strptime(scheduledDepartureTime[0], FMT)
+    tdelta = str(tdelta).split(':')[1]
+    tdelta = int(tdelta)
+    tdelta = [tdelta]
+    x = np.array([tdelta])
+else:
+    tdelta = datetime.strptime(scheduledDepartureTime[0], FMT) - datetime.strptime(actualDepartureTime[0], FMT)
+    tdelta = str(tdelta).split(':')[1]
+    tdelta = '-' + tdelta
+    tdelta = int(tdelta)
+    tdelta = [tdelta]
+    x = np.array([tdelta])
 
-    if actualDepartureTime[i] != '':
+arrDelay = int(actualArrivalTime[1]) - int(scheduledArrivalTime[1])
+FMT = '%H%M'
+if arrDelay >= 0:
+    tdelta = datetime.strptime(actualArrivalTime[1], FMT) - datetime.strptime(scheduledArrivalTime[1], FMT)
+    tdelta = str(tdelta).split(':')[1]
+    tdelta = int(tdelta)
+    y = np.array(tdelta)
+else:
+    tdelta = datetime.strptime(scheduledArrivalTime[1], FMT) - datetime.strptime(actualArrivalTime[1], FMT)
+    tdelta = str(tdelta).split(':')[1]
+    tdelta = '-' + tdelta
+    tdelta = int(tdelta)
+    y = np.array(tdelta)
+
+
+
+
+
+for i in range(2, len(scheduledDepartureTime), 2):
+
+    if (actualDepartureTime[i] != '') and (actualArrivalTime[i+1] != '') \
+            and (scheduledDepartureTime[i] != '') and (scheduledArrivalTime[i+1] != ''):
         depDelay = int(actualDepartureTime[i]) - int(scheduledDepartureTime[i])
         FMT = '%H%M'
         if depDelay >= 0:
@@ -107,27 +144,39 @@ for i in range(0, len(scheduledArrivalTime), 2):
             tdelta = str(tdelta).split(':')[1]
             tdelta = int(tdelta)
             tdelta = [tdelta]
-            x = np.append(x, [tdelta])
-
-
+            x = np.append(x, [tdelta], axis=0)
         else:
             tdelta = datetime.strptime(scheduledDepartureTime[i], FMT) - datetime.strptime(actualDepartureTime[i], FMT)
             tdelta = str(tdelta).split(':')[1]
             tdelta = '-' + tdelta
             tdelta = int(tdelta)
             tdelta = [tdelta]
-            x = np.append(x, tdelta)
+            x1 = np.append(x, [tdelta], axis=0)
+
+        arrDelay = int(actualArrivalTime[i+1]) - int(scheduledArrivalTime[i+1])
+        FMT = '%H%M'
+        if arrDelay >= 0:
+            tdelta = datetime.strptime(actualArrivalTime[i+1], FMT) - datetime.strptime(scheduledArrivalTime[i+1], FMT)
+            tdelta = str(tdelta).split(':')[1]
+            tdelta = int(tdelta)
+            y = np.append(y, tdelta)
+        else:
+            tdelta = datetime.strptime(scheduledArrivalTime[i+1], FMT) - datetime.strptime(actualArrivalTime[i+1], FMT)
+            tdelta = str(tdelta).split(':')[1]
+            tdelta = '-' + tdelta
+            tdelta = int(tdelta)
+            y = np.append(y, tdelta)
 
 print(x)
-        # print(tdelta)
+print(y)
 
 # Create a Gaussian Classifier
-# model = GaussianNB()
-#
-# # Train the model using the training sets
-# model.fit(x, y)
-#
-# #Predict Output
-# predicted= model.predict([[3]])
-# print(predicted)
+model = GaussianNB()
+
+# Train the model using the training sets
+model.fit(x, y)
+
+#Predict Output
+predicted= model.predict([[3]])
+print('Predicted delay in minutes: ' + predicted)
 
