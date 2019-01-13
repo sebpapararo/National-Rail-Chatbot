@@ -250,7 +250,7 @@ class trainBot(KnowledgeEngine):
                 self.declare(Action('get-human-answer'))
             else:
                 from main import botUpdate
-                botUpdate("Sorry I didn't recognise that station. Cloud you please try again?")
+                botUpdate("Sorry I didn't recognise that station. Could you please try again?")
 
     # Gets the destination
     @Rule(AS.f1 << Action('get-human-answer'),
@@ -566,7 +566,7 @@ class trainBot(KnowledgeEngine):
                 self.declare(Action('get-human-answer'))
             else:
                 from main import botUpdate
-                botUpdate("Sorry I didn't recognise that station. Cloud you please try again?")
+                botUpdate("Sorry I didn't recognise that station. Could you please try again?")
 
 
 
@@ -675,7 +675,7 @@ class trainBot(KnowledgeEngine):
                 self.declare(Action('get-human-answer'))
             else:
                 from main import botUpdate
-                botUpdate("Sorry that doesn't seem to be valid. Cloud you please try again?")
+                botUpdate("Sorry that doesn't seem to be valid. Could you please try again?")
 
     # Has everything
     @Rule(AS.f1 << Action('get-human-answer'),
