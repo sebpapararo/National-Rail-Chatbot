@@ -13,18 +13,8 @@ def getFareInfo(origin, destination, originDepDate, originDepTime, wantsReturn, 
     returnDepDate = returnDepDate.replace('/', '')
     returnDepTime = returnDepTime.replace(':', '')
 
-# origin = 'Diss'
     origin = origin.replace(' ', '%20')
-# destination = 'Norwich'
     destination = destination.replace(' ', '%20')
-# # Date is in format ddmmyy
-# originDepDate = '120119'
-# # Time is in 24 hr format like hhmm
-# originDepTime = '1315'
-# # If they are looking for a return ticket set boolean to True and fill out other 2 fields
-# wantsReturn = True
-# returnDepDate = '130119'
-# returnDepTime = '2145'
 
 
     theURL = 'http://ojp.nationalrail.co.uk/service/timesandfares/' + origin + '/' + destination + '/' \
@@ -36,8 +26,6 @@ def getFareInfo(origin, destination, originDepDate, originDepTime, wantsReturn, 
 
     page = urlopen(theURL).read()
     soup = BeautifulSoup(page, 'html.parser')
-
-    # print(theURL)
 
     # Ticket is a single
     if not wantsReturn:

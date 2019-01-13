@@ -724,8 +724,10 @@ class trainBot(KnowledgeEngine):
             predictedDelay = getPredictedDelay(origCode, destCode, int(delayByTime), delayDepDate, delayDepTime)
             if int(predictedDelay) > 0:
                 botUpdate('We expect a delay of %s minutes' % predictedDelay)
-            else:
+            elif int(predictedDelay) < 0:
                 botUpdate('We expect it will be %s minutes early' % predictedDelay)
+            else:
+                botUpdate('We expect your train to be on time!')
         elif answer == ('no' or 'n' or 'N'):
             from main import restartChat
             restartChat()
