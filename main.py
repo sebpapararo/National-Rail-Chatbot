@@ -105,4 +105,4 @@ def restartChat():
 if __name__ == '__main__':
     with app.app_context():
         restartChat()
-    app.run(host='127.0.0.1', debug=True)
+    app.run(host='127.0.0.1', debug=False)

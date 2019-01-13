@@ -12,6 +12,8 @@ origDepTime = ''
 retDepDate = ''
 retDepTime = ''
 wantsRet = False
+origCode = ''
+destCode = ''
 
 class information(Fact):
     booking = Field(bool, default=False)
@@ -90,23 +92,32 @@ class trainBot(KnowledgeEngine):
             wanRet = False
             retiDepDate = ''
             retiDepTime = ''
-            # loc = findStations(res)
+            origiCode = ''
+            destinCode = ''
             loc = findINandTO(res)
             print(loc)
             if loc:
-                global dest, orig
+                global dest, orig, destCode, origCode
                 if loc[0][1] == 'IN':
                     origi = loc[1][0]
                     orig = origi
+                    origiCode = getStationCode(loc[1][0])
+                    origCode = origiCode
                     if len(loc) > 2:
                         destin = loc[3][0]
                         dest = destin
+                        destinCode = getStationCode(loc[3][0])
+                        destCode = destinCode
                 elif loc[0][1] == 'TO':
                     destin = loc[1][0]
                     dest = destin
+                    destinCode = getStationCode(loc[1][0])
+                    destCode = destinCode
                     if len(loc) > 2:
                         origi = loc[3][0]
                         orig = origi
+                        origiCode = getStationCode(loc[3][0])
+                        origCode = origiCode
 
             if dateInFirstMessage(res):
                 global origDepDate
@@ -172,8 +183,9 @@ class trainBot(KnowledgeEngine):
             answer = uInput
             if isRealStation(answer):
                 self.modify(f2, origin=answer)
-                global orig
+                global orig, origCode
                 orig = uInput
+                origCode = getStationCode(uInput)
                 self.declare(Action('get-human-answer'))
             else:
                 from main import botUpdate
@@ -206,8 +218,9 @@ class trainBot(KnowledgeEngine):
             answer = uInput
             if isRealStation(answer):
                 self.modify(f2, destination=answer)
-                global dest
+                global dest, destCode
                 dest = uInput
+                destCode = getStationCode(uInput)
                 self.declare(Action('get-human-answer'))
             else:
                 from main import botUpdate

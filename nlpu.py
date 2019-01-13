@@ -106,14 +106,25 @@ def findINandTO(sentence):
 
 def isRealStation(station):
     locs = []
-    with open('allstations.txt', 'r') as allStations:
+    with open('allStattionsAndCodes.txt', 'r') as allStations:
         data = allStations.readlines()
     for line in data:
-        locs = line.split(", ")
+        locs.append(line.splitlines())
     for l in locs:
-        if(station.lower() == l.lower()):
+        if(station.lower() == l[0].split(",")[0].lower()):
             return True
     return False
+
+def getStationCode(station):
+    locs = []
+    with open('allStattionsAndCodes.txt', 'r') as allStations:
+        data = allStations.readlines()
+    for line in data:
+        locs.append(line.splitlines())
+    for l in locs:
+        if(station.lower() == l[0].split(",")[0].lower()):
+            return l[0].split(",")[1].upper()
+
 
 def isTimeFormat(time):
     rex = re.compile("^[0-9]{2}[:][0-9]{2}$")
@@ -137,7 +148,7 @@ def isDateFormat(date):
         return False
 
 def wantsTicket(input):
-    key = (('book','VB'),('ticket', 'NN'),('ticket', 'NNP'))
+    key = (('book','VB'),('book','NN'),('ticket', 'NN'),('ticket', 'NNP'))
     for k in key:
         if k in input:
             return True
@@ -147,7 +158,7 @@ def wantsTicket(input):
 
 def removeWantsTicketPart(input):
     final = []
-    key = 'book','ticket'
+    key = 'book','ticket','reserve'
     for index, i in enumerate(input):
         if len(input)-1 != index:
             if (input[index][0].lower() and input[index+1][0].lower()) not in key:
