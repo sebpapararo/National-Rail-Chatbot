@@ -86,20 +86,20 @@ class trainBot(KnowledgeEngine):
         question = uInput
         res = tuple(Custom_pos_tag(word_tokenize(question)))
         print(res)
+        destin = ''
+        origi = ''
+        origiDepDate = ''
+        origiDepTime = ''
+        wanRet = False
+        retiDepDate = ''
+        retiDepTime = ''
+        origiCode = ''
+        destinCode = ''
         if wantsTicket(res):
             res = removeWantsTicketPart(res)
-            print(res)
-            destin = ''
-            origi = ''
-            origiDepDate = ''
-            origiDepTime = ''
-            wanRet = False
-            retiDepDate = ''
-            retiDepTime = ''
-            origiCode = ''
-            destinCode = ''
+            # print(res)
             loc = findINandTO(res)
-            print(loc)
+            # print(loc)
             if loc:
                 global dest, orig, destCode, origCode
                 if loc[0][1] == 'IN':
@@ -155,6 +155,30 @@ class trainBot(KnowledgeEngine):
         elif wantsPredicted(res):
             # print("They want to get train delay information")
 
+            loc = findINandTO(res)
+            print(loc)
+            if loc:
+                global dest, orig, destCode, origCode
+                if loc[0][1] == 'IN':
+                    origi = loc[1][0]
+                    orig = origi
+                    origiCode = getStationCode(loc[1][0])
+                    origCode = origiCode
+                    if len(loc) > 2:
+                        destin = loc[3][0]
+                        dest = destin
+                        destinCode = getStationCode(loc[3][0])
+                        destCode = destinCode
+                elif loc[0][1] == 'TO':
+                    destin = loc[1][0]
+                    dest = destin
+                    destinCode = getStationCode(loc[1][0])
+                    destCode = destinCode
+                    if len(loc) > 2:
+                        origi = loc[3][0]
+                        orig = origi
+                        origiCode = getStationCode(loc[3][0])
+                        origCode = origiCode
 
             if dateInFirstMessage(res):
                 global delayDepDate
