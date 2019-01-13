@@ -159,7 +159,7 @@ def wantsTicket(input):
 
 def removeWantsTicketPart(input):
     final = []
-    key = 'book','ticket','reserve'
+    key = 'book','ticket','reserve', 'by', 'delayed', 'delay'
     for index, i in enumerate(input):
         if len(input)-1 != index:
             if (input[index][0].lower() and input[index+1][0].lower()) not in key:
@@ -222,3 +222,7 @@ def wantsPredicted(input):
         if k in input:
             return True
     return False
+
+def isNumber(input):
+    rex = re.compile("^\d+$")
+    return rex.match(input)

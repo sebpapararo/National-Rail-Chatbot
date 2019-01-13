@@ -16,10 +16,10 @@ delayDepDate = ''
 delayDepTime = ''
 origCode = ''
 destCode = ''
+delayByTime = ''
 
 class information(Fact):
     booking = Field(bool, default=False)
-    wantsPredicted = Field(bool, default=False)
 
     origin = Field(str)
     destination = Field(str)
@@ -32,6 +32,14 @@ class information(Fact):
     returnDepTime = Field(str)
 
     isCorrect = Field(bool, default=False)
+
+    wantsPredicted = Field(bool, default=False)
+    delayDepDate = Field(str)
+    delayDepTime = Field(str)
+    delayDestCode = Field(str)
+    delayCurrCode = Field(str)
+    delayedBy = Field(str)
+
 
 
 class Action(Fact):
@@ -53,7 +61,11 @@ class trainBot(KnowledgeEngine):
                 6: 'request-data',
                 7: 'want-return',
                 8: 'receive-return-dep-date',
-                9: 'receive-return-dep-time'
+                9: 'receive-return-dep-time',
+                10: 'receive-current',
+                11: 'receive-delay-destination',
+                12: 'receive-delayed-by',
+                13: 'is-delay-correct'
             }
             return switcher.get(lastBotReply)
 
@@ -67,7 +79,8 @@ class trainBot(KnowledgeEngine):
     def bot_rules(self):
         yield information(booking=False, wantsPredicted=False, isCorrect=False, origin='', destination='',
                           wantsReturn=False, askedReturn=False, originDepDate='', originDepTime='',
-                          returnDepDate='', returnDepTime='')
+                          returnDepDate='', returnDepTime='', delayDepDate='', delayDepTime='', delayDestCode='',
+                          delayCurrCode='', delayedBy='')
 
     @Rule()
     def startup(self):
@@ -83,6 +96,7 @@ class trainBot(KnowledgeEngine):
           AS.f2 << information(booking=False, wantsPredicted=False))
     def receive_human_answer(self, f1, f2):
         self.retract(f1)
+        global dest, orig, destCode, origCode
         question = uInput
         res = tuple(Custom_pos_tag(word_tokenize(question)))
         print(res)
@@ -101,7 +115,6 @@ class trainBot(KnowledgeEngine):
             loc = findINandTO(res)
             # print(loc)
             if loc:
-                global dest, orig, destCode, origCode
                 if loc[0][1] == 'IN':
                     origi = loc[1][0]
                     orig = origi
@@ -154,11 +167,14 @@ class trainBot(KnowledgeEngine):
             self.declare(Action('get-human-answer'))
         elif wantsPredicted(res):
             # print("They want to get train delay information")
+            res = removeWantsTicketPart(res)
+            print(res)
+            delDepDate = ''
+            delDepTime = ''
 
             loc = findINandTO(res)
             print(loc)
             if loc:
-                global dest, orig, destCode, origCode
                 if loc[0][1] == 'IN':
                     origi = loc[1][0]
                     orig = origi
@@ -183,16 +199,18 @@ class trainBot(KnowledgeEngine):
             if dateInFirstMessage(res):
                 global delayDepDate
                 delayDepDate = dateInFirstMessage(res)
-                origiDepDate = dateInFirstMessage(res)
+                delDepDate = dateInFirstMessage(res)
 
             if timeInFirstMessage(res):
                 global delayDepTime
                 delayDepTime = timeInFirstMessage(res)
-                origiDepTime = timeInFirstMessage(res)
+                delDepTime = timeInFirstMessage(res)
 
-            self.modify(f2, wantsPredicted=True)
+            print("blah bla:" + origiCode + "dsadsad: " + destinCode)
+            self.modify(f2, wantsPredicted=True, delayCurrCode=origiCode, delayDestCode=destinCode,
+                        deldelayDepDate=delDepDate, delayDepTime=delDepTime)
 
-
+            self.declare(Action('get-human-answer'))
 
         else:
             from main import botUpdate
@@ -464,45 +482,252 @@ class trainBot(KnowledgeEngine):
     def receive_is_correct(self, f1, f2):
         self.retract(f1)
         answer = uInput
+        from main import botUpdate
         if answer == ('yes' or 'y' or 'Y'):
             self.modify(f2, isCorrect=True)
             # print('Ready to request actual data!')
             from nrailFareInfo import getFareInfo
-            from main import botUpdate
             global orig, dest, origDepDate, origDepTime, wantsRet, retDepDate, retDepTime
 
             theURL = getFareInfo(orig, dest, origDepDate, origDepTime, wantsRet, retDepDate, retDepTime)
             botUpdate(theURL)
-
-    # @Rule(AS.f1 << Action('determine-another-question'))
-    # def another_question(self, f1):
-    #     self.retract(f1)
-    #     if not self.yes_or_no("Do you have another question?"):
-    #         print("Thanks for using me, and I hope everything worked sufficiently")
-    #     else:
-    #         print("How may i help you today?")
-    #         self.declare(Action('get-human-answer'))
-    #
-    # @Rule(AS.f1 << Action('unknown-input'))
-    # def unknown_input(self, f1):
-    #     self.retract(f1)
-    #     from main import botUpdate
-    #     botUpdate("I'm sorry, I didn't understand that. Please try again.")
-    #     # print("I'm sorry, I didn't understand that. Please try again.")
+        elif answer == ('no' or 'n' or 'N'):
+            from main import restartChat
+            restartChat()
+        else:
+            botUpdate("Sorry, I didn't understand that. Enter yes or no.")
 
 ################################################################################
 ##########################  Section 2  #########################################
 
+    # Gets the destination
+    @Rule(AS.f1 << Action('get-human-answer'),
+          AS.f2 << information(wantsPredicted=True, delayDestCode=''))
+    def get_delay_destination(self, f1, f2):
+        try:
+            self.retract(f1)
+        except:
+            pass
+        else:
+            from main import botUpdate
+            global lastBotReply
+            lastBotReply = 11
+            botUpdate('What station is your destination?')
+
+    # Receives the destination
+    @Rule(AS.f1 << Action('receive-delay-destination'),
+          AS.f2 << information(wantsPredicted=True, delayDestCode=''))
+    def receive__delay_destination(self, f1, f2):
+        try:
+            self.retract(f1)
+        except:
+            pass
+        else:
+            answer = uInput
+            if isRealStation(answer):
+                global dest, destCode
+                dest = uInput
+                destCode = getStationCode(uInput)
+                self.modify(f2, delayDestCode=destCode)
+                self.declare(Action('get-human-answer'))
+            else:
+                from main import botUpdate
+                botUpdate("Sorry I didn't recognise that station. Could you please try again?")
+
+    # Asks the origin/current location
+    @Rule(AS.f1 << Action('get-human-answer'),
+          AS.f2 << information(wantsPredicted=True, delayCurrCode=''))
+    def get_delay_origin(self, f1, f2):
+        try:
+            self.retract(f1)
+        except:
+            pass
+        else:
+            from main import botUpdate
+            global lastBotReply
+            lastBotReply = 10
+            botUpdate('What station are you currently at?')
+
+    # Receives the origin/current location
+    @Rule(AS.f1 << Action('receive-current'),
+          AS.f2 << information(wantsPredicted=True, delayCurrCode=''))
+    def receive_delay_origin(self, f1, f2):
+        try:
+            self.retract(f1)
+        except:
+            pass
+        else:
+            answer = uInput
+            if isRealStation(answer):
+                global orig, origCode
+                orig = uInput
+                origCode = getStationCode(uInput)
+                self.modify(f2, delayCurrCode=origCode)
+                self.declare(Action('get-human-answer'))
+            else:
+                from main import botUpdate
+                botUpdate("Sorry I didn't recognise that station. Cloud you please try again?")
 
 
 
+    # Gets the travel date
+    @Rule(AS.f1 << Action('get-human-answer'),
+          AS.f2 << information(wantsPredicted=True, delayDepDate=''))
+    def get_origin_del_dep_date(self, f1, f2):
+        try:
+            self.retract(f1)
+            # self.retract(f2)
+        except:
+            pass
+        else:
+            from main import botUpdate
+            global lastBotReply
+            lastBotReply = 4
+            botUpdate('What date are you traveling?')
+
+    # Receives the travel date
+    @Rule(AS.f1 << Action('receive-origin-dep-date'),
+          AS.f2 << information(wantsPredicted=True, delayDepDate=''))
+    def receive_origin_del_dep_date(self, f1, f2):
+        try:
+            self.retract(f1)
+        except:
+            pass
+        else:
+            answer = uInput
+            if isDateFormat(answer):
+                global delayDepDate
+                delayDepDate = uInput
+                self.modify(f2, delayDepDate=answer)
+                self.declare(Action('get-human-answer'))
+            else:
+                from main import botUpdate
+                botUpdate("Sorry that didn't seem to be the correct date format. Could you please try again?")
+                botUpdate("i.e (dd/mm/yy) | 31/12/18")
 
 
+    # Gets the origin departure time
+    @Rule(AS.f1 << Action('get-human-answer'),
+          AS.f2 << information(wantsPredicted=True, delayDepTime=''))
+    def get_origin_del_dep_time(self, f1, f2):
+        try:
+            self.retract(f1)
+            # self.retract(f2)
+        except:
+            pass
+        else:
+            from main import botUpdate
+            global lastBotReply
+            lastBotReply = 5
+            botUpdate('What time are you travelling?')
 
+    # Receives the origin departure time
+    @Rule(AS.f1 << Action('receive-origin-dep-time'),
+          AS.f2 << information(wantsPredicted=True, delayDepTime=''))
+    def receive_origin_del_dep_time(self, f1, f2):
+        try:
+            self.retract(f1)
+        except:
+            pass
+        else:
+            answer = uInput
+            if isTimeFormat(answer) and isValidTime(answer):
+                global delayDepTime
+                delayDepTime = uInput
+                self.modify(f2, delayDepTime=delayDepTime)
+                self.declare(Action('get-human-answer'))
+            elif isValidTime(answer) == False and isTimeFormat(answer) == True:
+                from main import botUpdate
+                botUpdate("Sorry that didn't seem to be a valid time. Could you please try again?")
+            else:
+                from main import botUpdate
+                botUpdate("Sorry that didn't seem to be the correct format. Could you please try again?")
+                botUpdate("i.e (hh:mm) | 14:30")
 
+    # Asks how much they are delayed by
+    @Rule(AS.f1 << Action('get-human-answer'),
+          AS.f2 << information(wantsPredicted=True, delayedBy=''))
+    def get_delayed_by(self, f1, f2):
+        try:
+            self.retract(f1)
+        except:
+            pass
+        else:
+            from main import botUpdate
+            global lastBotReply
+            lastBotReply = 12
+            botUpdate('How many minutes are you delayed by?')
 
+    # Receives how much they are delayed by
+    @Rule(AS.f1 << Action('receive-delayed-by'),
+          AS.f2 << information(wantsPredicted=True, delayedBy=''))
+    def receive_delayed_by(self, f1, f2):
+        try:
+            self.retract(f1)
+        except:
+            pass
+        else:
+            answer = uInput
+            if isNumber(answer):
+                global delayByTime
+                delayByTime = uInput
+                self.modify(f2, delayedBy=delayByTime)
+                self.declare(Action('get-human-answer'))
+            else:
+                from main import botUpdate
+                botUpdate("Sorry that doesn't seem to be valid. Cloud you please try again?")
 
+    # Has everything
+    @Rule(AS.f1 << Action('get-human-answer'),
+          AS.f2 << information(wantsPredicted=True),
+          NOT(information(delayDepDate='')),
+          NOT(information(delayDepTime='')),
+          NOT(information(delayDestCode='')),
+          NOT(information(delayCurrCode='')),
+          NOT(information(delayedBy=''))
+          )
+    def has_everything_delay(self, f1, f2):
+        self.retract(f1)
+        # print('It has everything')
+        self.declare(Action('check-delay-info'))
 
+    @Rule(AS.f1 << Action('check-delay-info'),
+          AS.f2 << information(
+              wantsPredicted=MATCH.wantPredic,
+              delayDepDate=MATCH.delDepD,
+              delayDepTime=MATCH.delDepT,
+              delayDestCode=MATCH.delDest,
+              delayCurrCode=MATCH.delCurr,
+              delayedBy=MATCH.delBy)
+          )
+    def check_info_delay(self, f1, wantPredic, delDepD, delDepT, delDest, delCurr, delBy):
+        self.retract(f1)
+        from main import botUpdate
+        global lastBotReply, orig, dest
+        lastBotReply = 13
+        botUpdate('You want to check the predicted train delay from %s to %s on %s at %s' % \
+            (orig.title(), dest.title(), delDepD, delDepT))
+        botUpdate('Is this information correct yes or no?')
 
+    @Rule(AS.f1 << Action('is-delay-correct'),
+          AS.f2 << information(isCorrect=False))
+    def receive_is_correct_delay(self, f1, f2):
+        self.retract(f1)
+        answer = uInput
+        from main import botUpdate
+        if answer == ('yes' or 'y' or 'Y'):
+            self.modify(f2, isCorrect=True)
+            # print('Ready to request actual data!')
+            from hspTrainInfo import getPredictedDelay
+            global origCode, destCode, delayByTime, delayDepDate, delayDepTime
 
-
+            predictedDelay = getPredictedDelay(origCode, destCode, int(delayByTime), delayDepDate, delayDepTime)
+            if int(predictedDelay) > 0:
+                botUpdate('We expect a delay of %s minutes' % predictedDelay)
+            else:
+                botUpdate('We expect it will be %s minutes early' % predictedDelay)
+        elif answer == ('no' or 'n' or 'N'):
+            from main import restartChat
+            restartChat()
+        else:
+            botUpdate("Sorry, I didn't understand that. Enter yes or no.")
