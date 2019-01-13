@@ -148,7 +148,8 @@ def isDateFormat(date):
         return False
 
 def wantsTicket(input):
-    key = (('book','VB'),('book','NN'),('ticket', 'NN'),('ticket', 'NNP'))
+    key = (('book','VB'),('book', 'NN'),('ticket', 'NN'),('ticket', 'NNP'),
+           ('times', 'NNS'), ('reserve', 'VB'))
     for k in key:
         if k in input:
             return True
@@ -214,5 +215,10 @@ def retTimeInFirstMessage(input):
             if rex.match(item):
                 return item
 
-def wantsTime(input):
+def wantsPredicted(input):
+    key = (('delay','NN'),('predicted', 'VBD'),('predict', 'NN'),('delayed', 'VBD'),
+           ('arrival', 'JJ'), ('predict', 'IN'))
+    for k in key:
+        if k in input:
+            return True
     return False

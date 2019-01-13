@@ -12,11 +12,14 @@ origDepTime = ''
 retDepDate = ''
 retDepTime = ''
 wantsRet = False
+delayDepDate = ''
+delayDepTime = ''
 origCode = ''
 destCode = ''
 
 class information(Fact):
     booking = Field(bool, default=False)
+    wantsPredicted = Field(bool, default=False)
 
     origin = Field(str)
     destination = Field(str)
@@ -62,8 +65,9 @@ class trainBot(KnowledgeEngine):
 
     @DefFacts()
     def bot_rules(self):
-        yield information(booking=False, isCorrect=False, origin='', destination='', wantsReturn=False, askedReturn=False,
-                          originDepDate='', originDepTime='', returnDepDate='', returnDepTime='')
+        yield information(booking=False, wantsPredicted=False, isCorrect=False, origin='', destination='',
+                          wantsReturn=False, askedReturn=False, originDepDate='', originDepTime='',
+                          returnDepDate='', returnDepTime='')
 
     @Rule()
     def startup(self):
@@ -71,12 +75,12 @@ class trainBot(KnowledgeEngine):
         global lastBotReply
         lastBotReply = 0
         botUpdate('Hello, how may I help you today?')
-        botUpdate('e.g. Can I book a train ticket, Get trains times for...')
+        botUpdate('e.g. Can I book a train ticket, Get my predicted arrival time...')
         botUpdate('Please enter dates in the format: dd/mm/yy, and times in the 24hr format: hh:mm')
 
     # Do they want to book a ticket
     @Rule(AS.f1 << Action('get-human-answer'),
-          AS.f2 << information(booking=False))
+          AS.f2 << information(booking=False, wantsPredicted=False))
     def receive_human_answer(self, f1, f2):
         self.retract(f1)
         question = uInput
@@ -148,12 +152,27 @@ class trainBot(KnowledgeEngine):
                         originDepTime=origiDepTime, wantsReturn=wanRet, returnDepDate=retiDepDate,
                         returnDepTime=retiDepTime)
             self.declare(Action('get-human-answer'))
-        elif wantsTime(res):
-            print("They want to get arrival time")
+        elif wantsPredicted(res):
+            # print("They want to get train delay information")
+
+
+            if dateInFirstMessage(res):
+                global delayDepDate
+                delayDepDate = dateInFirstMessage(res)
+                origiDepDate = dateInFirstMessage(res)
+
+            if timeInFirstMessage(res):
+                global delayDepTime
+                delayDepTime = timeInFirstMessage(res)
+                origiDepTime = timeInFirstMessage(res)
+
+            self.modify(f2, wantsPredicted=True)
+
+
 
         else:
             from main import botUpdate
-            botUpdate("Sorry I didn't understand what you said. Cloud you please try again?")
+            botUpdate("Sorry I didn't understand what you said. Could you please try again?")
 
 
     # Asks the origin
