@@ -99,7 +99,7 @@ class trainBot(KnowledgeEngine):
         global dest, orig, destCode, origCode
         question = uInput
         res = tuple(Custom_pos_tag(word_tokenize(question)))
-        print(res)
+        # print(res)
         destin = ''
         origi = ''
         origiDepDate = ''
@@ -168,12 +168,12 @@ class trainBot(KnowledgeEngine):
         elif wantsPredicted(res):
             # print("They want to get train delay information")
             res = removeWantsTicketPart(res)
-            print(res)
+            # print(res)
             delDepDate = ''
             delDepTime = ''
 
             loc = findINandTO(res)
-            print(loc)
+            # print(loc)
             if loc:
                 if loc[0][1] == 'IN':
                     origi = loc[1][0]
@@ -206,9 +206,8 @@ class trainBot(KnowledgeEngine):
                 delayDepTime = timeInFirstMessage(res)
                 delDepTime = timeInFirstMessage(res)
 
-            print("blah bla:" + origiCode + "dsadsad: " + destinCode)
             self.modify(f2, wantsPredicted=True, delayCurrCode=origiCode, delayDestCode=destinCode,
-                        deldelayDepDate=delDepDate, delayDepTime=delDepTime)
+                        delayDepDate=delDepDate, delayDepTime=delDepTime)
 
             self.declare(Action('get-human-answer'))
 
@@ -301,7 +300,8 @@ class trainBot(KnowledgeEngine):
             from main import botUpdate
             global lastBotReply
             lastBotReply = 4
-            botUpdate('What date would you like to depart? Please enter in dd/mm/yy format.')
+            botUpdate('What date would you like to depart?')
+            botUpdate('Please enter in dd/mm/yy format or common words like today and tomorrow.')
 
     # Receives the origin departure date
     @Rule(AS.f1 << Action('receive-origin-dep-date'),
@@ -312,7 +312,7 @@ class trainBot(KnowledgeEngine):
         except:
             pass
         else:
-            answer = uInput
+            answer = isDateWord(uInput)
             if isDateFormat(answer):
                 self.modify(f2, originDepDate=answer)
                 global origDepDate
@@ -321,7 +321,7 @@ class trainBot(KnowledgeEngine):
             else:
                 from main import botUpdate
                 botUpdate("Sorry that didn't seem to be the correct date format. Could you please try again?")
-                botUpdate("i.e (dd/mm/yy) | 31/12/18")
+                botUpdate("i.e (dd/mm/yy) | 31/12/18 | today | tomorrow")
 
     # Gets the origin departure time
     @Rule(AS.f1 << Action('get-human-answer'),
@@ -336,7 +336,8 @@ class trainBot(KnowledgeEngine):
             from main import botUpdate
             global lastBotReply
             lastBotReply = 5
-            botUpdate('What time would you like depart? Please enter in hh:mm 24hr format.')
+            botUpdate('What time would you like depart?')
+            botUpdate('Please enter in hh:mm 24hr format.')
 
     # Receives the origin departure time
     @Rule(AS.f1 << Action('receive-origin-dep-time'),
@@ -404,7 +405,8 @@ class trainBot(KnowledgeEngine):
         from main import botUpdate
         global lastBotReply
         lastBotReply = 8
-        botUpdate('What date would you like to return on? Please enter in dd/mm/yy format.')
+        botUpdate('What date would you like to return on?')
+        botUpdate('Please enter in dd/mm/yy format or common words like today and tomorrow.')
 
     # Receives the return departure date
     @Rule(AS.f1 << Action('receive-return-dep-date'),
@@ -412,10 +414,16 @@ class trainBot(KnowledgeEngine):
     def receive_return_dep_date(self, f1, f2):
         self.retract(f1)
         answer = uInput
-        self.modify(f2, returnDepDate=answer)
-        global retDepDate
-        retDepDate = uInput
-        self.declare(Action('get-human-answer'))
+        answer = isDateWord(uInput)
+        if isDateFormat(answer):
+            self.modify(f2, returnDepDate=answer)
+            global retDepDate
+            retDepDate = uInput
+            self.declare(Action('get-human-answer'))
+        else:
+            from main import botUpdate
+            botUpdate("Sorry that didn't seem to be the correct date format. Could you please try again?")
+            botUpdate("i.e (dd/mm/yy) | 31/12/18 | today | tomorrow")
 
     # Gets the return departure time
     @Rule(AS.f1 << Action('get-human-answer'),
@@ -425,7 +433,8 @@ class trainBot(KnowledgeEngine):
         from main import botUpdate
         global lastBotReply
         lastBotReply = 9
-        botUpdate('What time would you like your return ticket to be? Please enter in hh:mm 24 hr format.')
+        botUpdate('What time would you like your return ticket to be?')
+        botUpdate('Please enter in hh:mm 24hr format.')
 
     # Receives the return departure time
     @Rule(AS.f1 << Action('receive-return-dep-time'),
@@ -433,10 +442,18 @@ class trainBot(KnowledgeEngine):
     def receive_return_dep_time(self, f1, f2):
         self.retract(f1)
         answer = uInput
-        self.modify(f2, returnDepTime=answer)
-        global retDepTime
-        retDepTime = uInput
-        self.declare(Action('get-human-answer'))
+        if isTimeFormat(answer) and isValidTime(answer):
+            self.modify(f2, returnDepTime=answer)
+            global retDepTime
+            retDepTime = uInput
+            self.declare(Action('get-human-answer'))
+        elif isValidTime(answer) == False and isTimeFormat(answer) == True:
+            from main import botUpdate
+            botUpdate("Sorry that didn't seem to be a valid time. Could you please try again?")
+        else:
+            from main import botUpdate
+            botUpdate("Sorry that didn't seem to be the correct format. Could you please try again?")
+            botUpdate("i.e (hh:mm) | 14:30")
 
 
     # Has everything
@@ -594,7 +611,7 @@ class trainBot(KnowledgeEngine):
         except:
             pass
         else:
-            answer = uInput
+            answer = isDateWord(uInput)
             if isDateFormat(answer):
                 global delayDepDate
                 delayDepDate = uInput

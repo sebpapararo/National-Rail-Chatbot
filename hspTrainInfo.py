@@ -145,7 +145,6 @@ def getPredictedDelay(currentLocationCode, destinationCode, delayedBy, travelDat
         y = np.array(tdelta)
 
     for i in range(2, len(scheduledDepartureTime), 2):
-
         if (actualDepartureTime[i] != '') and (actualArrivalTime[i+1] != '') \
                 and (scheduledDepartureTime[i] != '') and (scheduledArrivalTime[i+1] != ''):
             depDelay = int(actualDepartureTime[i]) - int(scheduledDepartureTime[i])
@@ -177,9 +176,6 @@ def getPredictedDelay(currentLocationCode, destinationCode, delayedBy, travelDat
                 tdelta = '-' + tdelta
                 tdelta = int(tdelta)
                 y = np.append(y, tdelta)
-
-    # print(x)
-    # print(y)
 
     # Create a Gaussian Classifier
     model = GaussianNB()

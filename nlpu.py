@@ -1,12 +1,7 @@
 import re
-
+import datetime
 import nltk
 from nltk import word_tokenize
-
-#This is tagging from a guide
-
-#https://nlpforhackers.io/training-pos-tagger/
-#https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
 
 tagged_sentences = nltk.corpus.treebank.tagged_sents()
 
@@ -40,9 +35,6 @@ cutoff = int(.75 * len(tagged_sentences))
 training_sentences = tagged_sentences[:cutoff]
 test_sentences = tagged_sentences[cutoff:]
 
-# print(len(training_sentences))  # 2935
-# print(len(test_sentences)) # 979
-
 def transform_to_dataset(tagged_sentences):
     X, y = [], []
 
@@ -66,12 +58,10 @@ clf = Pipeline([
 
 clf.fit(X[:7000],
         y[:7000])
-# Use only the first 10K samples if you're running it multiple times. It takes a fair bit :)
 
 print('Custom tagger training completed')
 
 X_test, y_test = transform_to_dataset(test_sentences)
-
 # print("Accuracy:", clf.score(X_test, y_test))
 
 def Custom_pos_tag(sentence):
@@ -147,15 +137,23 @@ def isDateFormat(date):
     else:
         return False
 
+def isDateWord(date):
+    if date == 'today':
+        return datetime.datetime.today().strftime('%d/%m/%y')
+    elif date == 'tomorrow':
+        return (datetime.date.today() + datetime.timedelta(days=1)).strftime('%d/%m/%y')
+    else:
+        return date
+
 def wantsTicket(input):
-    key = (('book','VB'),('book', 'NN'),('ticket', 'NN'),('ticket', 'NNP'),
-           ('times', 'NNS'), ('reserve', 'VB'))
+    key = (('book','VB'),('book', 'NN'),('ticket', 'NN'),('ticket', 'NNP'), ('reserve', 'VB'),
+           ('go', 'VB'), ('want', 'VB'))
     for k in key:
         if k in input:
             return True
-    if len(findStations(input)) > 0:
-        return True
-    return False
+    # if len(findStations(input)) > 0:
+    #     return True
+    # return False
 
 def removeWantsTicketPart(input):
     final = []
@@ -174,10 +172,12 @@ def dateInFirstMessage(input):
     rex = re.compile("^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{2}$")
     if 'return' in input:
         for item in input[:input.index('return')]:
+            item = isDateWord(item)
             if rex.match(item):
                 return item
     else:
         for item in input:
+            item = isDateWord(item)
             if rex.match(item):
                 return item
 
@@ -204,6 +204,7 @@ def retDateInFirstMessage(input):
     rex = re.compile("^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{2}$")
     if 'return' in input:
         for item in input[input.index('return'):]:
+            item = isDateWord(item)
             if rex.match(item):
                 return item
 
@@ -217,7 +218,7 @@ def retTimeInFirstMessage(input):
 
 def wantsPredicted(input):
     key = (('delay','NN'),('predicted', 'VBD'),('predict', 'NN'),('delayed', 'VBD'),
-           ('arrival', 'JJ'), ('predict', 'IN'))
+           ('arrival', 'JJ'), ('predict', 'IN'), ('times', 'NNS'), ('time', 'NN'),('arrive', 'VBP'))
     for k in key:
         if k in input:
             return True
