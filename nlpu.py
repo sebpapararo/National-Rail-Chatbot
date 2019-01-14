@@ -1,9 +1,13 @@
 import re
 import datetime
 import nltk
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.feature_extraction import DictVectorizer
+from sklearn.pipeline import Pipeline
 from nltk import word_tokenize
 
 tagged_sentences = nltk.corpus.treebank.tagged_sents()
+
 
 def features(sentence, index):
     """ sentence: [w1, w2, ...], index: the index of the word """
@@ -27,6 +31,7 @@ def features(sentence, index):
         'capitals_inside': sentence[index][1:].lower() != sentence[index][1:]
     }
 
+
 def untag(tagged_sentence):
     return [w for w, t in tagged_sentence]
 
@@ -34,6 +39,7 @@ def untag(tagged_sentence):
 cutoff = int(.75 * len(tagged_sentences))
 training_sentences = tagged_sentences[:cutoff]
 test_sentences = tagged_sentences[cutoff:]
+
 
 def transform_to_dataset(tagged_sentences):
     X, y = [], []
@@ -45,11 +51,8 @@ def transform_to_dataset(tagged_sentences):
 
     return X, y
 
-X, y = transform_to_dataset(training_sentences)
 
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.feature_extraction import DictVectorizer
-from sklearn.pipeline import Pipeline
+X, y = transform_to_dataset(training_sentences)
 
 clf = Pipeline([
     ('vectorizer', DictVectorizer(sparse=False)),
@@ -62,17 +65,17 @@ clf.fit(X[:7000],
 print('Custom tagger training completed')
 
 X_test, y_test = transform_to_dataset(test_sentences)
-# print("Accuracy:", clf.score(X_test, y_test))
+
 
 def Custom_pos_tag(sentence):
     tags = clf.predict([features(sentence, index) for index in range(len(sentence))])
     return zip(sentence, tags)
 
+
 def findStations(sentence):
     locs = []
     found = []
-    # sent = untag(sentence)
-    # sent = word_tokenize(sentence)
+
     with open('allstations.txt', 'r') as allStations:
         data = allStations.readlines()
     for line in data:
@@ -85,6 +88,7 @@ def findStations(sentence):
                 break
     return found
 
+
 def findINandTO(sentence):
     found = []
     for index, w in enumerate(sentence):
@@ -93,6 +97,7 @@ def findINandTO(sentence):
                 found.append(sentence[index])
                 found.append(sentence[index+1])
     return found
+
 
 def isRealStation(station):
     locs = []
@@ -104,6 +109,7 @@ def isRealStation(station):
         if(station.lower() == l[0].split(",")[0].lower()):
             return True
     return False
+
 
 def getStationCode(station):
     locs = []
@@ -123,12 +129,14 @@ def isTimeFormat(time):
     else:
         return False
 
+
 def isValidTime(time):
     rex = re.compile("^[0-2][0-9][:][0-5][0-9]$")
     if rex.match(time):
         return True
     else:
         return False
+
 
 def isDateFormat(date):
     rex = re.compile("^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{2}$")
@@ -137,6 +145,7 @@ def isDateFormat(date):
     else:
         return False
 
+
 def isDateWord(date):
     if date == 'today':
         return datetime.datetime.today().strftime('%d/%m/%y')
@@ -144,6 +153,7 @@ def isDateWord(date):
         return (datetime.date.today() + datetime.timedelta(days=1)).strftime('%d/%m/%y')
     else:
         return date
+
 
 def wantsTicket(input):
     key = (('book','VB'),('book', 'NN'),('ticket', 'NN'),('ticket', 'NNP'), ('reserve', 'VB'),
@@ -154,6 +164,7 @@ def wantsTicket(input):
     # if len(findStations(input)) > 0:
     #     return True
     # return False
+
 
 def removeWantsTicketPart(input):
     final = []
@@ -166,6 +177,7 @@ def removeWantsTicketPart(input):
         else:
             final.append(i)
     return final
+
 
 def dateInFirstMessage(input):
     input = untag(input)
@@ -181,6 +193,7 @@ def dateInFirstMessage(input):
             if rex.match(item):
                 return item
 
+
 def timeInFirstMessage(input):
     input = untag(input)
     rex = re.compile("^[0-2][0-9][:][0-5][0-9]$")
@@ -193,11 +206,13 @@ def timeInFirstMessage(input):
             if rex.match(item):
                 return item
 
+
 def wantsReturn(input):
     input = untag(input)
     if 'return' in input:
         return True
     return False
+
 
 def retDateInFirstMessage(input):
     input = untag(input)
@@ -208,6 +223,7 @@ def retDateInFirstMessage(input):
             if rex.match(item):
                 return item
 
+
 def retTimeInFirstMessage(input):
     input = untag(input)
     rex = re.compile("^[0-2][0-9][:][0-5][0-9]$")
@@ -216,6 +232,7 @@ def retTimeInFirstMessage(input):
             if rex.match(item):
                 return item
 
+
 def wantsPredicted(input):
     key = (('delay','NN'),('predicted', 'VBD'),('predict', 'NN'),('delayed', 'VBD'),
            ('arrival', 'JJ'), ('predict', 'IN'), ('times', 'NNS'), ('time', 'NN'),('arrive', 'VBP'))
@@ -223,6 +240,7 @@ def wantsPredicted(input):
         if k in input:
             return True
     return False
+
 
 def isNumber(input):
     rex = re.compile("^\d+$")

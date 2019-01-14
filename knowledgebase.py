@@ -18,6 +18,7 @@ origCode = ''
 destCode = ''
 delayByTime = ''
 
+
 class information(Fact):
     booking = Field(bool, default=False)
 
@@ -41,15 +42,16 @@ class information(Fact):
     delayedBy = Field(str)
 
 
-
 class Action(Fact):
     pass
+
 
 class trainBot(KnowledgeEngine):
 
     def passReply(userInput, engine):
         global uInput
         uInput = userInput.lower()
+
         def switch_demo(lastbotreply):
             switcher = {
                 0: 'get-human-answer',
@@ -71,9 +73,6 @@ class trainBot(KnowledgeEngine):
 
         global lastBotReply
         engine.declare(Action(switch_demo(lastBotReply)))
-
-    def yes_or_no(self, question):
-        return input(question).upper().startswith('Y')
 
     @DefFacts()
     def bot_rules(self):
@@ -111,9 +110,7 @@ class trainBot(KnowledgeEngine):
         destinCode = ''
         if wantsTicket(res):
             res = removeWantsTicketPart(res)
-            # print(res)
             loc = findINandTO(res)
-            # print(loc)
             if loc:
                 if loc[0][1] == 'IN':
                     origi = loc[1][0]
@@ -165,15 +162,13 @@ class trainBot(KnowledgeEngine):
                         originDepTime=origiDepTime, wantsReturn=wanRet, returnDepDate=retiDepDate,
                         returnDepTime=retiDepTime)
             self.declare(Action('get-human-answer'))
+
         elif wantsPredicted(res):
-            # print("They want to get train delay information")
             res = removeWantsTicketPart(res)
-            # print(res)
             delDepDate = ''
             delDepTime = ''
 
             loc = findINandTO(res)
-            # print(loc)
             if loc:
                 if loc[0][1] == 'IN':
                     origi = loc[1][0]
@@ -215,14 +210,12 @@ class trainBot(KnowledgeEngine):
             from main import botUpdate
             botUpdate("Sorry I didn't understand what you said. Could you please try again?")
 
-
     # Asks the origin
     @Rule(AS.f1 << Action('get-human-answer'),
           AS.f2 << information(booking=True, origin=''))
-    def get_human_origin(self, f1, f2):
+    def get_human_origin(self, f1):
         try:
             self.retract(f1)
-            # self.retract(f2)
         except:
             pass
         else:
@@ -240,9 +233,8 @@ class trainBot(KnowledgeEngine):
         except:
             pass
         else:
-            answer = uInput
-            if isRealStation(answer):
-                self.modify(f2, origin=answer)
+            if isRealStation(uInput):
+                self.modify(f2, origin=uInput)
                 global orig, origCode
                 orig = uInput
                 origCode = getStationCode(uInput)
@@ -254,10 +246,9 @@ class trainBot(KnowledgeEngine):
     # Gets the destination
     @Rule(AS.f1 << Action('get-human-answer'),
           AS.f2 << information(booking=True, destination=''))
-    def get_human_destination(self, f1, f2):
+    def get_human_destination(self, f1):
         try:
             self.retract(f1)
-            # self.retract(f2)
         except:
             pass
         else:
@@ -275,9 +266,8 @@ class trainBot(KnowledgeEngine):
         except:
             pass
         else:
-            answer = uInput
-            if isRealStation(answer):
-                self.modify(f2, destination=answer)
+            if isRealStation(uInput):
+                self.modify(f2, destination=uInput)
                 global dest, destCode
                 dest = uInput
                 destCode = getStationCode(uInput)
@@ -286,14 +276,12 @@ class trainBot(KnowledgeEngine):
                 from main import botUpdate
                 botUpdate("Sorry I didn't recognise that station. Could you please try again?")
 
-
     # Gets the origin departure date
     @Rule(AS.f1 << Action('get-human-answer'),
           AS.f2 << information(booking=True, originDepDate=''))
-    def get_origin_dep_date(self, f1, f2):
+    def get_origin_dep_date(self, f1):
         try:
             self.retract(f1)
-            # self.retract(f2)
         except:
             pass
         else:
@@ -312,9 +300,8 @@ class trainBot(KnowledgeEngine):
         except:
             pass
         else:
-            answer = isDateWord(uInput)
-            if isDateFormat(answer):
-                self.modify(f2, originDepDate=answer)
+            if isDateFormat(isDateWord(uInput)):
+                self.modify(f2, originDepDate=isDateWord(uInput))
                 global origDepDate
                 origDepDate = uInput
                 self.declare(Action('get-human-answer'))
@@ -326,10 +313,9 @@ class trainBot(KnowledgeEngine):
     # Gets the origin departure time
     @Rule(AS.f1 << Action('get-human-answer'),
           AS.f2 << information(booking=True, originDepTime=''))
-    def get_origin_dep_time(self, f1, f2):
+    def get_origin_dep_time(self, f1):
         try:
             self.retract(f1)
-            # self.retract(f2)
         except:
             pass
         else:
@@ -348,13 +334,12 @@ class trainBot(KnowledgeEngine):
         except:
             pass
         else:
-            answer = uInput
-            if isTimeFormat(answer) and isValidTime(answer):
-                self.modify(f2, originDepTime=answer)
+            if isTimeFormat(uInput) and isValidTime(uInput):
+                self.modify(f2, originDepTime=uInput)
                 global origDepTime
                 origDepTime = uInput
                 self.declare(Action('get-human-answer'))
-            elif isValidTime(answer) == False and isTimeFormat(answer) == True:
+            elif isValidTime(uInput) == False and isTimeFormat(uInput) == True:
                 from main import botUpdate
                 botUpdate("Sorry that didn't seem to be a valid time. Could you please try again?")
             else:
@@ -372,7 +357,7 @@ class trainBot(KnowledgeEngine):
           information(askedReturn=False),
           information(wantsReturn=False)
           )
-    def getWantReturn(self, f1, f2):
+    def getWantReturn(self, f1):
         self.retract(f1)
         from main import botUpdate
         global lastBotReply
@@ -400,7 +385,7 @@ class trainBot(KnowledgeEngine):
     # Gets the return departure date
     @Rule(AS.f1 << Action('get-human-answer'),
           AS.f2 << information(booking=True, wantsReturn=True, returnDepDate=''))
-    def get_return_dep_date(self, f1, f2):
+    def get_return_dep_date(self, f1):
         self.retract(f1)
         from main import botUpdate
         global lastBotReply
@@ -413,10 +398,8 @@ class trainBot(KnowledgeEngine):
           AS.f2 << information(booking=True, wantsReturn=True, returnDepDate=''))
     def receive_return_dep_date(self, f1, f2):
         self.retract(f1)
-        answer = uInput
-        answer = isDateWord(uInput)
-        if isDateFormat(answer):
-            self.modify(f2, returnDepDate=answer)
+        if isDateFormat(isDateWord(uInput)):
+            self.modify(f2, returnDepDate=isDateWord(uInput))
             global retDepDate
             retDepDate = uInput
             self.declare(Action('get-human-answer'))
@@ -428,7 +411,7 @@ class trainBot(KnowledgeEngine):
     # Gets the return departure time
     @Rule(AS.f1 << Action('get-human-answer'),
           AS.f2 << information(booking=True, wantsReturn=True, returnDepTime=''))
-    def get_return_dep_time(self, f1, f2):
+    def get_return_dep_time(self, f1):
         self.retract(f1)
         from main import botUpdate
         global lastBotReply
@@ -441,20 +424,18 @@ class trainBot(KnowledgeEngine):
           AS.f2 << information(booking=True, wantsReturn=True, returnDepTime=''))
     def receive_return_dep_time(self, f1, f2):
         self.retract(f1)
-        answer = uInput
-        if isTimeFormat(answer) and isValidTime(answer):
-            self.modify(f2, returnDepTime=answer)
+        if isTimeFormat(uInput) and isValidTime(uInput):
+            self.modify(f2, returnDepTime=uInput)
             global retDepTime
             retDepTime = uInput
             self.declare(Action('get-human-answer'))
-        elif isValidTime(answer) == False and isTimeFormat(answer) == True:
+        elif isValidTime(uInput) is False and isTimeFormat(uInput) is True:
             from main import botUpdate
             botUpdate("Sorry that didn't seem to be a valid time. Could you please try again?")
         else:
             from main import botUpdate
             botUpdate("Sorry that didn't seem to be the correct format. Could you please try again?")
             botUpdate("i.e (hh:mm) | 14:30")
-
 
     # Has everything
     @Rule(AS.f1 << Action('get-human-answer'),
@@ -466,10 +447,8 @@ class trainBot(KnowledgeEngine):
           OR(AND(information(wantsReturn=True), NOT(information(retDepDate='')), NOT(information(retDepTime=''))),
              AND(information(wantsReturn=False), information(askedReturn=True)))
           )
-    def has_everything(self, f1, f2):
+    def has_everything(self, f1):
         self.retract(f1)
-        # self.retract(f2)
-        # print('It has everything')
         self.declare(Action('check-info'))
 
     @Rule(AS.f1 << Action('check-info'),
@@ -484,7 +463,7 @@ class trainBot(KnowledgeEngine):
             returnDepTime=MATCH.retDepTime
             )
           )
-    def check_info(self, f1, f2, org, dest, orgDepDate, orgDepTime, wantsRet, retDepDate, retDepTime):
+    def check_info(self, f1, org, dest, orgDepDate, orgDepTime, wantsRet, retDepDate, retDepTime):
         self.retract(f1)
         from main import botUpdate
         global lastBotReply
@@ -498,17 +477,15 @@ class trainBot(KnowledgeEngine):
           AS.f2 << information(isCorrect=False))
     def receive_is_correct(self, f1, f2):
         self.retract(f1)
-        answer = uInput
         from main import botUpdate
-        if answer == ('yes' or 'y' or 'Y'):
+        if uInput == ('yes' or 'y' or 'Y'):
             self.modify(f2, isCorrect=True)
             # print('Ready to request actual data!')
             from nrailFareInfo import getFareInfo
             global orig, dest, origDepDate, origDepTime, wantsRet, retDepDate, retDepTime
-
             theURL = getFareInfo(orig, dest, origDepDate, origDepTime, wantsRet, retDepDate, retDepTime)
             botUpdate(theURL)
-        elif answer == ('no' or 'n' or 'N'):
+        elif uInput == ('no' or 'n' or 'N'):
             from main import restartChat
             restartChat()
         else:
@@ -516,11 +493,12 @@ class trainBot(KnowledgeEngine):
 
 ################################################################################
 ##########################  Section 2  #########################################
+################################################################################
 
     # Gets the destination
     @Rule(AS.f1 << Action('get-human-answer'),
           AS.f2 << information(wantsPredicted=True, delayDestCode=''))
-    def get_delay_destination(self, f1, f2):
+    def get_delay_destination(self, f1):
         try:
             self.retract(f1)
         except:
@@ -540,8 +518,7 @@ class trainBot(KnowledgeEngine):
         except:
             pass
         else:
-            answer = uInput
-            if isRealStation(answer):
+            if isRealStation(uInput):
                 global dest, destCode
                 dest = uInput
                 destCode = getStationCode(uInput)
@@ -554,7 +531,7 @@ class trainBot(KnowledgeEngine):
     # Asks the origin/current location
     @Rule(AS.f1 << Action('get-human-answer'),
           AS.f2 << information(wantsPredicted=True, delayCurrCode=''))
-    def get_delay_origin(self, f1, f2):
+    def get_delay_origin(self, f1):
         try:
             self.retract(f1)
         except:
@@ -574,8 +551,7 @@ class trainBot(KnowledgeEngine):
         except:
             pass
         else:
-            answer = uInput
-            if isRealStation(answer):
+            if isRealStation(uInput):
                 global orig, origCode
                 orig = uInput
                 origCode = getStationCode(uInput)
@@ -585,15 +561,12 @@ class trainBot(KnowledgeEngine):
                 from main import botUpdate
                 botUpdate("Sorry I didn't recognise that station. Could you please try again?")
 
-
-
     # Gets the travel date
     @Rule(AS.f1 << Action('get-human-answer'),
           AS.f2 << information(wantsPredicted=True, delayDepDate=''))
-    def get_origin_del_dep_date(self, f1, f2):
+    def get_origin_del_dep_date(self, f1):
         try:
             self.retract(f1)
-            # self.retract(f2)
         except:
             pass
         else:
@@ -611,25 +584,22 @@ class trainBot(KnowledgeEngine):
         except:
             pass
         else:
-            answer = isDateWord(uInput)
-            if isDateFormat(answer):
+            if isDateFormat(isDateWord(uInput)):
                 global delayDepDate
                 delayDepDate = uInput
-                self.modify(f2, delayDepDate=answer)
+                self.modify(f2, delayDepDate=isDateWord(uInput))
                 self.declare(Action('get-human-answer'))
             else:
                 from main import botUpdate
                 botUpdate("Sorry that didn't seem to be the correct date format. Could you please try again?")
                 botUpdate("i.e (dd/mm/yy) | 31/12/18")
 
-
     # Gets the origin departure time
     @Rule(AS.f1 << Action('get-human-answer'),
           AS.f2 << information(wantsPredicted=True, delayDepTime=''))
-    def get_origin_del_dep_time(self, f1, f2):
+    def get_origin_del_dep_time(self, f1):
         try:
             self.retract(f1)
-            # self.retract(f2)
         except:
             pass
         else:
@@ -647,13 +617,12 @@ class trainBot(KnowledgeEngine):
         except:
             pass
         else:
-            answer = uInput
-            if isTimeFormat(answer) and isValidTime(answer):
+            if isTimeFormat(uInput) and isValidTime(uInput):
                 global delayDepTime
                 delayDepTime = uInput
                 self.modify(f2, delayDepTime=delayDepTime)
                 self.declare(Action('get-human-answer'))
-            elif isValidTime(answer) == False and isTimeFormat(answer) == True:
+            elif isValidTime(uInput) is False and isTimeFormat(uInput) is True:
                 from main import botUpdate
                 botUpdate("Sorry that didn't seem to be a valid time. Could you please try again?")
             else:
@@ -664,7 +633,7 @@ class trainBot(KnowledgeEngine):
     # Asks how much they are delayed by
     @Rule(AS.f1 << Action('get-human-answer'),
           AS.f2 << information(wantsPredicted=True, delayedBy=''))
-    def get_delayed_by(self, f1, f2):
+    def get_delayed_by(self, f1):
         try:
             self.retract(f1)
         except:
@@ -684,8 +653,7 @@ class trainBot(KnowledgeEngine):
         except:
             pass
         else:
-            answer = uInput
-            if isNumber(answer):
+            if isNumber(uInput):
                 global delayByTime
                 delayByTime = uInput
                 self.modify(f2, delayedBy=delayByTime)
@@ -703,9 +671,8 @@ class trainBot(KnowledgeEngine):
           NOT(information(delayCurrCode='')),
           NOT(information(delayedBy=''))
           )
-    def has_everything_delay(self, f1, f2):
+    def has_everything_delay(self, f1):
         self.retract(f1)
-        # print('It has everything')
         self.declare(Action('check-delay-info'))
 
     @Rule(AS.f1 << Action('check-delay-info'),
@@ -730,9 +697,8 @@ class trainBot(KnowledgeEngine):
           AS.f2 << information(isCorrect=False))
     def receive_is_correct_delay(self, f1, f2):
         self.retract(f1)
-        answer = uInput
         from main import botUpdate
-        if answer == ('yes' or 'y' or 'Y'):
+        if uInput == ('yes' or 'y' or 'Y'):
             self.modify(f2, isCorrect=True)
             # print('Ready to request actual data!')
             from hspTrainInfo import getPredictedDelay
@@ -745,7 +711,7 @@ class trainBot(KnowledgeEngine):
                 botUpdate('We expect it will be %s minutes early' % predictedDelay)
             else:
                 botUpdate('We expect your train to be on time!')
-        elif answer == ('no' or 'n' or 'N'):
+        elif uInput == ('no' or 'n' or 'N'):
             from main import restartChat
             restartChat()
         else:

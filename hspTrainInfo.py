@@ -4,16 +4,9 @@ from sklearn.naive_bayes import GaussianNB
 import numpy as np
 
 
-
-
 def getPredictedDelay(currentLocationCode, destinationCode, delayedBy, travelDate, travelTime):
 
     from datetime import datetime, timedelta
-
-    # currentLocation = 'NRW'
-    # destination = 'IPS'
-    # # in Minutes needs to be converted to int here
-    # delayedBy = 1
 
     # Format the time correctly by removing the colon
     travelTime = travelTime.replace(':', '')
@@ -30,7 +23,6 @@ def getPredictedDelay(currentLocationCode, destinationCode, delayedBy, travelDat
     # Set the date period to the previous 30 days
     from_date = datetime.strptime(travelDate, '%Y-%m-%d') - timedelta(days=31)
     from_date = str(from_date).split(' ')[0]
-
     to_date = datetime.strptime(travelDate, '%Y-%m-%d') - timedelta(days=1)
     to_date = str(to_date).split(' ')[0]
 
@@ -42,9 +34,7 @@ def getPredictedDelay(currentLocationCode, destinationCode, delayedBy, travelDat
     else:
         weekDay = 'WEEKDAY'
 
-
     api_url = "https://hsp-prod.rockshore.net/api/v1/serviceMetrics"
-    # api_url = "https://hsp-prod.rockshore.net/api/v1/serviceDetails"
 
     headers = {"Content-Type": "application/json"}
     auths = ("n.lilly@uea.ac.uk","Qwerty123_")
@@ -61,19 +51,13 @@ def getPredictedDelay(currentLocationCode, destinationCode, delayedBy, travelDat
 
     r = requests.post(api_url, headers=headers, auth=auths, json=data)
 
-    # print(json.dumps(json.loads(r.text), sort_keys=True, indent=2, separators=(',',': ')))
-
     parsedInfo = json.loads(r.text)
-    # print(parsedInfo, sort_keys=True, indent=2)
 
     allMatchingRIDS = []
 
     for service in parsedInfo['Services']:
-      # print(service.get('serviceAttributesMetrics').get('rids'))
       for matchedTrains in service.get('serviceAttributesMetrics').get('rids'):
         allMatchingRIDS.append(matchedTrains)
-
-    # print(allMatchingRIDS)
 
     api_url = 'https://hsp-prod.rockshore.net/api/v1/serviceDetails'
 
@@ -98,20 +82,8 @@ def getPredictedDelay(currentLocationCode, destinationCode, delayedBy, travelDat
           actualDepartureTime.append(loc.get('actual_td'))
           location.append(loc.get('location'))
 
-    # print(scheduledArrivalTime)
-    # print(actualArrivalTime)
-    # print(scheduledDepartureTime)
-    # print(actualDepartureTime)
-    # print(location)
-
-    # print(len(scheduledArrivalTime))
-    # print(len(scheduledDepartureTime))
-
-
     import numpy as np
     from sklearn.naive_bayes import GaussianNB
-
-
     from datetime import datetime
 
     depDelay = int(actualDepartureTime[0]) - int(scheduledDepartureTime[0])
@@ -185,5 +157,5 @@ def getPredictedDelay(currentLocationCode, destinationCode, delayedBy, travelDat
 
     # Predict Output
     predicted = model.predict([[delayedBy]])
-    # print('Predicted delay in minutes: ' + str(predicted))
+
     return str(predicted[0])
