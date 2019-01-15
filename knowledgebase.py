@@ -109,6 +109,10 @@ class trainBot(KnowledgeEngine):
         origiCode = ''
         destinCode = ''
         if wantsTicket(res):
+            if wantsReturn(res):
+                global wantsRet
+                wantsRet = wantsReturn(res)
+                wanRet = wantsReturn(res)
             res = removeWantsTicketPart(res)
             loc = findINandTO(res)
             if loc:
@@ -143,17 +147,12 @@ class trainBot(KnowledgeEngine):
                 origDepTime = timeInFirstMessage(res)
                 origiDepTime = timeInFirstMessage(res)
 
-            if wantsReturn(res):
-                global wantsRet
-                wantsRet = wantsReturn(res)
-                wanRet = wantsReturn(res)
-
-            if retDateInFirstMessage(res):
+            if retDateInFirstMessage(res) is not False:
                 global retDepDate
                 retDepDate = retDateInFirstMessage(res)
                 retiDepDate = retDateInFirstMessage(res)
 
-            if retTimeInFirstMessage(res):
+            if retTimeInFirstMessage(res) is not False:
                 global retDepTime
                 retDepTime = retTimeInFirstMessage(res)
                 retiDepTime = retTimeInFirstMessage(res)
@@ -516,7 +515,6 @@ class trainBot(KnowledgeEngine):
             from main import botUpdate
             if uInput == ('yes' or 'y' or 'Y'):
                 self.modify(f2, isCorrect=True)
-                # print('Ready to request actual data!')
                 from nrailFareInfo import getFareInfo
                 global orig, dest, origDepDate, origDepTime, wantsRet, retDepDate, retDepTime
                 try:
@@ -751,7 +749,6 @@ class trainBot(KnowledgeEngine):
             from main import botUpdate
             if uInput == ('yes' or 'y' or 'Y'):
                 self.modify(f2, isCorrect=True)
-                # print('Ready to request actual data!')
                 from hspTrainInfo import getPredictedDelay
                 global origCode, destCode, delayByTime, delayDepDate, delayDepTime
                 try:

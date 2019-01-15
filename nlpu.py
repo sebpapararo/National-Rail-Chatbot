@@ -169,7 +169,9 @@ def removeWantsTicketPart(input):
     key = 'book','ticket','reserve', 'by', 'delayed', 'delay'
     for index, i in enumerate(input):
         if len(input)-1 != index:
-            if (input[index][0].lower() and input[index+1][0].lower()) not in key:
+            if i == 'return':
+                continue
+            elif (input[index][0].lower() and input[index+1][0].lower()) not in key:
                 if(input[index][0].lower()) not in key:
                     final.append(i)
         else:
@@ -220,6 +222,8 @@ def retDateInFirstMessage(input):
             item = isDateWord(item)
             if rex.match(item):
                 return item
+    else:
+        return False
 
 
 def retTimeInFirstMessage(input):
@@ -229,6 +233,8 @@ def retTimeInFirstMessage(input):
         for item in input[input.index('return'):]:
             if rex.match(item):
                 return item
+    else:
+        return False
 
 
 def wantsPredicted(input):
