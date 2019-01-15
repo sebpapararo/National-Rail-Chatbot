@@ -223,7 +223,7 @@ def retDateInFirstMessage(input):
             if rex.match(item):
                 return item
     else:
-        return False
+        return ''
 
 
 def retTimeInFirstMessage(input):
@@ -234,13 +234,13 @@ def retTimeInFirstMessage(input):
             if rex.match(item):
                 return item
     else:
-        return False
+        return ''
 
 
 def wantsPredicted(input):
     key = (('delay','NN'),('predicted', 'VBD'),('predict', 'NN'),('delayed', 'VBD'),
            ('arrival', 'JJ'), ('predict', 'IN'), ('times', 'NNS'), ('time', 'NN'),
-           ('arrive', 'VBP'), ('expected', 'VBN') )
+           ('arrive', 'VBP'), ('expected', 'VBN'), ('delayed', 'VBN'))
     for k in key:
         if k in input:
             return True

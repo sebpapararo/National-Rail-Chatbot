@@ -88,7 +88,7 @@ class trainBot(KnowledgeEngine):
         lastBotReply = 0
         botUpdate('Hello, how may I help you today?')
         botUpdate('e.g. Can I book a train ticket, Get my predicted arrival time...')
-        botUpdate('Please enter dates in the format: dd/mm/yy, and times in the 24hr format: hh:mm')
+        botUpdate('Please enter dates in the format: dd/mm/yy, today, tomorrow, and times in the 24hr format: hh:mm')
 
     # Do they want to book a ticket
     @Rule(AS.f1 << Action('get-human-answer'),
@@ -147,12 +147,12 @@ class trainBot(KnowledgeEngine):
                 origDepTime = timeInFirstMessage(res)
                 origiDepTime = timeInFirstMessage(res)
 
-            if retDateInFirstMessage(res) is not False:
+            if retDateInFirstMessage(res) != '':
                 global retDepDate
                 retDepDate = retDateInFirstMessage(res)
                 retiDepDate = retDateInFirstMessage(res)
 
-            if retTimeInFirstMessage(res) is not False:
+            if retTimeInFirstMessage(res) != '':
                 global retDepTime
                 retDepTime = retTimeInFirstMessage(res)
                 retiDepTime = retTimeInFirstMessage(res)
