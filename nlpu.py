@@ -250,3 +250,21 @@ def wantsPredicted(input):
 def isNumber(input):
     rex = re.compile("^\d+$")
     return rex.match(input)
+
+def hasMultipule(input):
+    found = []
+    locs = []
+    if 'london' in input:
+        found = ['London Liverpool Street', 'London Bridge', 'London Euston', 'london Waterloo',
+                        'London Victoria', 'London Fenchurch Street']
+        return found
+    with open('allStattionsAndCodes.txt', 'r') as allStations:
+        data = allStations.readlines()
+    for line in data:
+        locs.append(line.splitlines())
+    for l in locs:
+        if input in l[0].split(",")[0].lower():
+            found.append(l[0].split(",")[0].lower())
+    print(found)
+    return found
+

@@ -88,7 +88,7 @@ class trainBot(KnowledgeEngine):
         lastBotReply = 0
         botUpdate('Hello, how may I help you today?')
         botUpdate('e.g. Can I book a train ticket, Get my predicted arrival time...')
-        botUpdate('Please enter dates in the format: dd/mm/yy, today, tomorrow, and times in the 24hr format: hh:mm')
+        botUpdate('Please enter in the format: dd/mm/yy, today, tomorrow, and time in the 24hr format: hh:mm')
 
     # Do they want to book a ticket
     @Rule(AS.f1 << Action('get-human-answer'),
@@ -238,6 +238,10 @@ class trainBot(KnowledgeEngine):
                 orig = uInput
                 origCode = getStationCode(uInput)
                 self.declare(Action('get-human-answer'))
+            elif len(hasMultipule(uInput)) > 1:
+                from main import botUpdate
+                locations = hasMultipule(uInput)
+                botUpdate("Did you mean? " + str(locations))
             else:
                 from main import botUpdate
                 botUpdate("Sorry I didn't recognise that station. Could you please try again?")
@@ -271,6 +275,10 @@ class trainBot(KnowledgeEngine):
                 dest = uInput
                 destCode = getStationCode(uInput)
                 self.declare(Action('get-human-answer'))
+            elif len(hasMultipule(uInput)) > 1:
+                from main import botUpdate
+                locations = hasMultipule(uInput)
+                botUpdate("Did you mean? " + str(locations))
             else:
                 from main import botUpdate
                 botUpdate("Sorry I didn't recognise that station. Could you please try again?")
@@ -564,6 +572,10 @@ class trainBot(KnowledgeEngine):
                 destCode = getStationCode(uInput)
                 self.modify(f2, delayDestCode=destCode)
                 self.declare(Action('get-human-answer'))
+            elif len(hasMultipule(uInput)) > 1:
+                from main import botUpdate
+                locations = hasMultipule(uInput)
+                botUpdate("Did you mean? " + str(locations))
             else:
                 from main import botUpdate
                 botUpdate("Sorry I didn't recognise that station. Could you please try again?")
@@ -597,6 +609,10 @@ class trainBot(KnowledgeEngine):
                 origCode = getStationCode(uInput)
                 self.modify(f2, delayCurrCode=origCode)
                 self.declare(Action('get-human-answer'))
+            elif len(hasMultipule(uInput)) > 1:
+                from main import botUpdate
+                locations = hasMultipule(uInput)
+                botUpdate("Did you mean? " + str(locations))
             else:
                 from main import botUpdate
                 botUpdate("Sorry I didn't recognise that station. Could you please try again?")
