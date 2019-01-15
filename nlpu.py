@@ -71,23 +71,21 @@ def Custom_pos_tag(sentence):
     tags = clf.predict([features(sentence, index) for index in range(len(sentence))])
     return zip(sentence, tags)
 
-
-def findStations(sentence):
-    locs = []
-    found = []
-
-    with open('allstations.txt', 'r') as allStations:
-        data = allStations.readlines()
-    for line in data:
-        locs = line.split(", ")
-    for index, w in enumerate(sentence):
-        for l in locs:
-            if(w[0].lower() == l.lower()):
-                found.append(sentence[index-1])
-                found.append(sentence[index])
-                break
-    return found
-
+# def findStations(sentence):
+#     locs = []
+#     found = []
+#
+#     with open('allstations.txt', 'r') as allStations:
+#         data = allStations.readlines()
+#     for line in data:
+#         locs = line.split(", ")
+#     for index, w in enumerate(sentence):
+#         for l in locs:
+#             if(w[0].lower() == l.lower()):
+#                 found.append(sentence[index-1])
+#                 found.append(sentence[index])
+#                 break
+#     return found
 
 def findINandTO(sentence):
     found = []
@@ -146,13 +144,13 @@ def isDateFormat(date):
         return False
 
 
-def isDateWord(date):
-    if date == 'today':
+def isDateWord(dateIn):
+    if dateIn == 'today':
         return datetime.datetime.today().strftime('%d/%m/%y')
-    elif date == 'tomorrow':
+    elif dateIn == 'tomorrow':
         return (datetime.date.today() + datetime.timedelta(days=1)).strftime('%d/%m/%y')
     else:
-        return date
+        return dateIn
 
 
 def wantsTicket(input):
@@ -235,7 +233,8 @@ def retTimeInFirstMessage(input):
 
 def wantsPredicted(input):
     key = (('delay','NN'),('predicted', 'VBD'),('predict', 'NN'),('delayed', 'VBD'),
-           ('arrival', 'JJ'), ('predict', 'IN'), ('times', 'NNS'), ('time', 'NN'),('arrive', 'VBP'))
+           ('arrival', 'JJ'), ('predict', 'IN'), ('times', 'NNS'), ('time', 'NN'),
+           ('arrive', 'VBP'), ('expected', 'VBN') )
     for k in key:
         if k in input:
             return True

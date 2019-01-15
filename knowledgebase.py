@@ -98,7 +98,7 @@ class trainBot(KnowledgeEngine):
         global dest, orig, destCode, origCode
         question = uInput
         res = tuple(Custom_pos_tag(word_tokenize(question)))
-        # print(res)
+        print(res)
         destin = ''
         origi = ''
         origiDepDate = ''
@@ -303,7 +303,7 @@ class trainBot(KnowledgeEngine):
             if isDateFormat(isDateWord(uInput)):
                 self.modify(f2, originDepDate=isDateWord(uInput))
                 global origDepDate
-                origDepDate = uInput
+                origDepDate = isDateWord(uInput)
                 self.declare(Action('get-human-answer'))
             else:
                 from main import botUpdate
@@ -401,7 +401,7 @@ class trainBot(KnowledgeEngine):
         if isDateFormat(isDateWord(uInput)):
             self.modify(f2, returnDepDate=isDateWord(uInput))
             global retDepDate
-            retDepDate = uInput
+            retDepDate = isDateWord(uInput)
             self.declare(Action('get-human-answer'))
         else:
             from main import botUpdate
@@ -483,8 +483,11 @@ class trainBot(KnowledgeEngine):
             # print('Ready to request actual data!')
             from nrailFareInfo import getFareInfo
             global orig, dest, origDepDate, origDepTime, wantsRet, retDepDate, retDepTime
-            theURL = getFareInfo(orig, dest, origDepDate, origDepTime, wantsRet, retDepDate, retDepTime)
-            botUpdate(theURL)
+            try:
+                theURL = getFareInfo(orig, dest, origDepDate, origDepTime, wantsRet, retDepDate, retDepTime)
+                botUpdate(theURL)
+            except:
+                botUpdate("Sorry, something went wrong could you please try again.")
         elif uInput == ('no' or 'n' or 'N'):
             from main import restartChat
             restartChat()
@@ -586,7 +589,7 @@ class trainBot(KnowledgeEngine):
         else:
             if isDateFormat(isDateWord(uInput)):
                 global delayDepDate
-                delayDepDate = uInput
+                delayDepDate = isDateWord(uInput)
                 self.modify(f2, delayDepDate=isDateWord(uInput))
                 self.declare(Action('get-human-answer'))
             else:
@@ -703,14 +706,17 @@ class trainBot(KnowledgeEngine):
             # print('Ready to request actual data!')
             from hspTrainInfo import getPredictedDelay
             global origCode, destCode, delayByTime, delayDepDate, delayDepTime
-
-            predictedDelay = getPredictedDelay(origCode, destCode, int(delayByTime), delayDepDate, delayDepTime)
-            if int(predictedDelay) > 0:
-                botUpdate('We expect a delay of %s minutes' % predictedDelay)
-            elif int(predictedDelay) < 0:
-                botUpdate('We expect it will be %s minutes early' % predictedDelay)
+            try:
+                predictedDelay = getPredictedDelay(origCode, destCode, int(delayByTime), delayDepDate, delayDepTime)
+            except:
+                botUpdate("Sorry, something went wrong.")
             else:
-                botUpdate('We expect your train to be on time!')
+                if int(predictedDelay) > 0:
+                    botUpdate('We expect a delay of %s minute(s)' % predictedDelay)
+                elif int(predictedDelay) < 0:
+                    botUpdate('We expect it will be %s minute(s) early' % predictedDelay)
+                else:
+                    botUpdate('We expect your train to be on time!')
         elif uInput == ('no' or 'n' or 'N'):
             from main import restartChat
             restartChat()
