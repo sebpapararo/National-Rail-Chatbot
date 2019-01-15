@@ -155,7 +155,7 @@ def isDateWord(dateIn):
 
 def wantsTicket(input):
     key = (('book','VB'),('book', 'NN'),('ticket', 'NN'),('ticket', 'NNP'), ('reserve', 'VB'),
-           ('go', 'VB'), ('want', 'VB'))
+           ('go', 'VB'), ('want', 'VB'), ('tickets', 'NNS'))
     for k in key:
         if k in input:
             return True

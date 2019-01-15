@@ -385,8 +385,11 @@ class trainBot(KnowledgeEngine):
                 global wantsRet
                 wantsRet = True
                 self.modify(f2, wantsReturn=True, askedReturn=True)
-            else:
+            elif uInput == ('no' or 'n' or 'N'):
                 self.modify(f2, askedReturn=True)
+            else:
+                from main import botUpdate
+                botUpdate("Sorry, I didn't understand that. Enter yes or no.")
             self.declare(Action('get-human-answer'))
 
     # Gets the return departure date
