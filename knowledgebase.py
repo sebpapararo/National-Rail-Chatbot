@@ -778,6 +778,7 @@ class trainBot(KnowledgeEngine):
                     if int(predictedDelay) > 0:
                         botUpdate('We expect a delay of %s minute(s)' % predictedDelay)
                     elif int(predictedDelay) < 0:
+                        predictedDelay = int(predictedDelay) * -1
                         botUpdate('We expect it will be %s minute(s) early' % predictedDelay)
                     else:
                         botUpdate('We expect your train to be on time!')

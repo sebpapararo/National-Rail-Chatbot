@@ -265,6 +265,5 @@ def hasMultipule(input):
     for l in locs:
         if input in l[0].split(",")[0].lower():
             found.append(l[0].split(",")[0].lower())
-    print(found)
     return found
 
