@@ -241,7 +241,7 @@ class trainBot(KnowledgeEngine):
             elif len(hasMultipule(uInput)) > 1:
                 from main import botUpdate
                 locations = hasMultipule(uInput)
-                botUpdate("Did you mean? " + str(locations))
+                botUpdate("Did you mean one of these? " + ', '.join(locations))
             else:
                 from main import botUpdate
                 botUpdate("Sorry I didn't recognise that station. Could you please try again?")
@@ -278,7 +278,7 @@ class trainBot(KnowledgeEngine):
             elif len(hasMultipule(uInput)) > 1:
                 from main import botUpdate
                 locations = hasMultipule(uInput)
-                botUpdate("Did you mean? " + str(locations))
+                botUpdate("Did you mean one of these? " + ', '.join(locations))
             else:
                 from main import botUpdate
                 botUpdate("Sorry I didn't recognise that station. Could you please try again?")
@@ -575,7 +575,7 @@ class trainBot(KnowledgeEngine):
             elif len(hasMultipule(uInput)) > 1:
                 from main import botUpdate
                 locations = hasMultipule(uInput)
-                botUpdate("Did you mean? " + str(locations))
+                botUpdate("Did you mean one of these? " + ', '.join(locations))
             else:
                 from main import botUpdate
                 botUpdate("Sorry I didn't recognise that station. Could you please try again?")
@@ -612,7 +612,7 @@ class trainBot(KnowledgeEngine):
             elif len(hasMultipule(uInput)) > 1:
                 from main import botUpdate
                 locations = hasMultipule(uInput)
-                botUpdate("Did you mean? " + str(locations))
+                botUpdate("Did you mean one of these? " + ', '.join(locations))
             else:
                 from main import botUpdate
                 botUpdate("Sorry I didn't recognise that station. Could you please try again?")
